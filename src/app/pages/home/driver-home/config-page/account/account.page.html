@@ -1,0 +1,52 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons>
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="saveChanges()">Guardar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card *ngIf="usuario" class="user-info-card">
+    <ion-card-header class="avatar-container">
+      <img [src]="usuario.img_usuario || 'assets/usuarios/default-user.png'" alt="Avatar" class="avatar-image">
+      <ion-icon name="pencil" class="edit-icon" (click)="selectImage()"></ion-icon>
+      <input type="file" accept="image/*" #fileInput (change)="uploadImage($event)" hidden>
+      <ion-card-title>{{ usuario.nombre }} {{ usuario.apellido }}</ion-card-title>
+      <ion-card-subtitle style="text-transform: capitalize;">{{ usuario.tipo }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list lines="none">
+        <ion-item>
+          <ion-label>
+            <h2>Nombre y Apellido:</h2>
+            <p>{{ usuario.nombre || 'No existente' }} {{ usuario.apellido || 'No existente' }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Teléfono:</h2>
+            <!-- Campo editable -->
+            <ion-input [(ngModel)]="usuario.telefono" placeholder="Ingrese su teléfono"></ion-input>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Email:</h2>
+            <p>{{ usuario.email || 'No existente' }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Edad:</h2>
+            <!-- Campo editable -->
+            <ion-input [(ngModel)]="usuario.edad" type="number" placeholder="Ingrese su edad"></ion-input>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

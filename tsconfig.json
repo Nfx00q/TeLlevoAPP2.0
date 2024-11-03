@@ -2,6 +2,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "types": ["google.maps"],
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
@@ -24,6 +25,10 @@
     ],
     "useDefineForClassFields": false
   },
+  "include": [
+    "src/**/*.ts",
+    "src/global.d.ts"  // Asegúrate de incluir tu archivo de declaración
+  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
