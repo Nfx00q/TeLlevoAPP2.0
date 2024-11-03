@@ -35,6 +35,10 @@ const routes: Routes = [
   {
     path: 'config-page',
     loadChildren: () => import('./pages/home/driver-home/config-page/config-page.module').then(m => ConfigPagePageModule)
+  },
+  {
+    path: 'user-home',
+    loadChildren: () => import('./pages/home/user-home/user-home.module').then( m => m.UserHomePageModule)
   }
 ];
 
