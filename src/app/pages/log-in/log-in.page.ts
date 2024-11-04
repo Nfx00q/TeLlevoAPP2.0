@@ -1,12 +1,10 @@
-import { DriverPage } from './../home/driver-home/driver-home.page';
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoadingController, MenuController } from '@ionic/angular';
+import { AlertController, LoadingController, MenuController } from '@ionic/angular';
 import { Usuario } from 'src/app/interfaces/usuario';
 import { AuthServiceService } from 'src/app/services/auth-service.service';
-
 import Swal from 'sweetalert2';
 
 @Component({
@@ -16,29 +14,30 @@ import Swal from 'sweetalert2';
 })
 export class LogInPage implements OnInit {
 
-  /* ----- DEFINIR LOGIN ----- */
-  
+  /* ----- Definir formularios ----- */
   loginForm: FormGroup;
   resetForm: FormGroup;
 
-  /* ----- DEFINIR VALORES DE INPUT ----- */
-  
+  /* ----- Valores de input ----- */
   emailValue: string = '';
   passValue: string = '';
 
   constructor(
     private router: Router,
-    private formBuilder: FormBuilder, 
+    private formBuilder: FormBuilder,
+    private alertController: AlertController,
     private loadingController: LoadingController,
     private menuController: MenuController,
-    private firestore: AngularFirestore,
-    private authService: AuthServiceService
-  ) { 
+    private authService: AuthServiceService,
+    private firestore: AngularFirestore
+  ) {
+    // Formulario de login
     this.loginForm = this.formBuilder.group({
-      email : ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email]],
       pass: ['', [Validators.required, Validators.minLength(6)]],
     });
 
+    // Formulario para resetear contraseña
     this.resetForm = this.formBuilder.group({
       email: ['']
     });
@@ -46,111 +45,73 @@ export class LogInPage implements OnInit {
 
   ngOnInit() {
     this.menuController.enable(false);
-    
-    try {
-      const usuarioLogin = localStorage.getItem('usuarioLogin');
-      
-      if (usuarioLogin) {
-        const usuarioData = JSON.parse(usuarioLogin);
 
-        this.firestore.collection('usuarios').doc(usuarioData.uid).get().toPromise().then(async doc => {
-          const data = doc?.data() as Usuario;
-
-          const loading = await this.loadingController.create({
-            message: 'Sesion detectada',
-            duration: 2000
-          });
-
-          (await loading).present();
-  
-          if (data) {
-            if (data.tipo === 'admin') {
-              this.router.navigate(['/admin-dash']);
-            } else if (data.tipo === 'usuario') {
-              this.router.navigate(['/user-home']);
-            } else if (data.tipo === 'conductor') {
-              this.router.navigate(['/driver-home']);
-            }
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error al parsear usuarioLogin:', error);
-      localStorage.removeItem('usuarioLogin');
+    // Comprobación de sesión persistente
+    const usuarioLogin = localStorage.getItem('usuarioLogin');
+    if (usuarioLogin) {
+      const usuarioData = JSON.parse(usuarioLogin);
+      this.firestore.collection('usuarios').doc(usuarioData.uid).get().toPromise().then(async doc => {
+        const data = doc?.data() as Usuario;
+        if (data) {
+          await this.navigateToDashboard(data.tipo!);
+        }
+      });
     }
   }
-  
-  /* ----- LOGIN ----- */
 
+  /* ----- Iniciar sesión ----- */
   async logIn() {
     const loading = await this.loadingController.create({
       message: 'Cargando.....',
-      duration: 2000,
+      duration: 2000
     });
 
     try {
-        await loading.present();
+      await loading.present();
+      const email = this.emailValue!;
+      const pass = this.passValue!;
 
-        const email = this.emailValue;
-        const pass = this.passValue;
+      // Iniciar sesión
+      const aux = await this.authService.login(email, pass);
+      if (aux.user) {
+        const usuarioDoc = await this.firestore.collection('usuarios').doc(aux.user.uid).get().toPromise();
+        const userData = usuarioDoc?.data() as Usuario;
 
-        // Intentar iniciar sesión
-        const aux = await this.authService.login(email, pass);
-
-        if (aux.user) {
-            // Obtener datos del usuario desde Firestore
-            const usuarioLogin = await this.firestore.collection('usuarios').doc(aux.user.uid).get().toPromise();
-            const data = usuarioLogin?.data() as Usuario;
-
-            // Verificar si la cuenta está deshabilitada
-            if (data.disabled) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Cuenta deshabilitada',
-                    text: 'Tu cuenta está deshabilitada. Por favor, contacta al soporte.',
-                    confirmButtonText: 'OK',
-                    heightAuto: false,
-                });
-                return;
-            }
-
-            // Almacenar información del usuario en localStorage
-            localStorage.setItem('usuarioLogin', JSON.stringify({ email, uid: aux.user.uid }));
-
-            // Manejar la navegación según el tipo de usuario
-            if (data) {
-                if (data.tipo === 'admin') {
-                    this.router.navigate(['/admin-dash']);
-                } else if (data.tipo === 'usuario') {
-                    this.router.navigate(['/user-home']);
-                } else if (data.tipo === 'conductor') {
-                    // Actualizar el estado activo en Firestore
-                    await this.firestore.collection('usuarios').doc(aux.user.uid).update({ activo: true });
-                    this.router.navigate(['/driver-home']);
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error en el inicio de sesión:', error);
-        Swal.fire({
+        // Verificación de cuenta deshabilitada
+        if (userData?.disabled) {
+          Swal.fire({
             icon: 'error',
-            title: 'Error',
-            text: 'Hubo un error al iniciar sesión. Verifica tus credenciales.',
+            title: 'Cuenta deshabilitada',
+            text: 'Tu cuenta está deshabilitada. Por favor, contacta al soporte.',
             confirmButtonText: 'OK',
             heightAuto: false,
-        });
-        this.emailValue = '';
-        this.passValue = '';
+          });
+          return;
+        }
+
+        // Guardar sesión en localStorage
+        localStorage.setItem('usuarioLogin', JSON.stringify({ email, uid: aux.user.uid }));
+        await this.navigateToDashboard(userData.tipo!);
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un error al iniciar sesión. Verifica tus credenciales.',
+        confirmButtonText: 'OK',
+        heightAuto: false,
+      });
+      this.emailValue = '';
+      this.passValue = '';
     } finally {
-        loading.dismiss();
+      loading.dismiss();
     }
   }
 
-  /* ----- Reset PASSWORD ----- */
-
+  /* ----- Resetear contraseña ----- */
   async resetPassword() {
     if (this.resetForm.valid) {
-      const email = this.resetForm.get('email')?.value;
+      const email = this.resetForm.get('email')?.value!;
       try {
         await this.authService.resetPassword(email);
         Swal.fire({
@@ -160,26 +121,36 @@ export class LogInPage implements OnInit {
           confirmButtonText: 'Gracias!',
           heightAuto: false
         });
-        return;
       } catch (error) {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'No pudimos enviar un mensaje de recuperación, verifica si tu correo esta bien escrito!',
+          text: 'No pudimos enviar un mensaje de recuperación, verifica si tu correo está bien escrito!',
           confirmButtonText: 'Reintentar',
           heightAuto: false
         });
-        return;
       }
     } else {
       console.error('Formulario no válido:', this.resetForm.errors);
     }
   }
 
-  /* ----- Ir A REGISTRO ----- */
-
-  goToRegister(){
-    this.router.navigate(['/sign-in']);
+  /* ----- Navegar a dashboard según el tipo de usuario ----- */
+  private async navigateToDashboard(tipo: string) {
+    if (tipo === 'admin') {
+      this.router.navigate(['/admin-dash']);
+    } else if (tipo === 'usuario') {
+      this.router.navigate(['/user-home']);
+    } else if (tipo === 'conductor') {
+      await this.firestore.collection('usuarios').doc(JSON.parse(localStorage.getItem('usuarioLogin')!).uid).update({ activo: true });
+      this.router.navigate(['/driver-home']);
+    } else {
+      this.router.navigate(['/invitado-dashboard']);
+    }
   }
 
+  /* ----- Ir a la página de registro ----- */
+  goToRegister() {
+    this.router.navigate(['/sign-in']);
+  }
 }

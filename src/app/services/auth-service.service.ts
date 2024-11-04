@@ -31,6 +31,10 @@ export class AuthServiceService {
     return this.angularFireAuth.authState;
   }
 
+  isLogged(): Observable<any> {
+    return this.angularFireAuth.authState; 
+  }
+
   async editUser(usuarioId: string, updatedData?: any) {
     await this.firestore.collection('usuarios').doc(usuarioId).update(updatedData);
   }
