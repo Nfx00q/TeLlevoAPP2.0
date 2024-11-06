@@ -8,6 +8,8 @@ import { UserHomePageRoutingModule } from './user-home-routing.module';
 
 import { UserHomePage } from './user-home.page';
 
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
+
 @NgModule({
   imports: [
     CommonModule,

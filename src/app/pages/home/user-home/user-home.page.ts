@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
+import { BarcodeScanner, ScanResult } from '@capacitor-mlkit/barcode-scanning';
 import { Geolocation } from '@capacitor/geolocation';
+import { Viajes } from 'src/app/interfaces/viajes';
 
 declare var google: any;
 
@@ -11,6 +14,11 @@ declare var google: any;
 })
 
 export class UserHomePage implements OnInit {
+
+  /* ----- Info del viaje SCANEADO ------ */
+
+  public codigoEscaneado: string = '';
+  viajeInfo: any;
 
   map: any;
   directionsService: any;
@@ -24,7 +32,7 @@ export class UserHomePage implements OnInit {
     { lat: -33.56692284768454, lng: -70.63052933119687, icon: 'assets/icon/stop.png', label: 'TL-3 / Av. Observatorio & Av. Sta. Rosa' },
   ];
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private firestore: AngularFirestore) { }
 
   ngOnInit() {
     this.loadGoogleMaps().then(() => {
@@ -103,4 +111,17 @@ export class UserHomePage implements OnInit {
     this.router.navigate(['/config-page']);
   }
 
+  /* ---- Scan QR Code ----- */
+
+  async scanQRCode() {
+    try {
+      // Llama al escáner de código de barras
+      const result = await BarcodeScanner.startScan();
+      
+      console.log('Resultado del escaneo:', result); // Ver qué tipo de objeto estamos recibiendo
+
+    } catch (error) {
+      console.error('Error al escanear el código QR:', error);
+    }
+  }
 }
