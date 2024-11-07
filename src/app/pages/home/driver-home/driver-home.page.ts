@@ -344,7 +344,7 @@ export class DriverPage implements OnInit, AfterViewInit {
               nom_destino: destino.label,
               nom_inicio: inicio.label,
               fecha: new Date().toISOString(),
-            nom_pasajero: this.nombreUsuario ?? 'Desconocido',
+              nom_pasajero: this.nombreUsuario ?? 'Desconocido',
               coordenada: JSON.stringify(pos),
               coordenada_destino: JSON.stringify({ lat: destino.lat, lng: destino.lng }),
             };

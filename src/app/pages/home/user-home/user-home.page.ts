@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
-import { BarcodeScanner, ScanResult } from '@capacitor-mlkit/barcode-scanning';
+import { BarcodeScanner, LensFacing, ScanResult } from '@capacitor-mlkit/barcode-scanning';
 import { Geolocation } from '@capacitor/geolocation';
+import { ModalController, Platform } from '@ionic/angular';
 import { Viajes } from 'src/app/interfaces/viajes';
+import { BarcodeScanningModalComponent } from './barcode-scanning-modal.component';
 
 declare var google: any;
 
@@ -32,12 +34,19 @@ export class UserHomePage implements OnInit {
     { lat: -33.56692284768454, lng: -70.63052933119687, icon: 'assets/icon/stop.png', label: 'TL-3 / Av. Observatorio & Av. Sta. Rosa' },
   ]
 
-  constructor(private router: Router, private firestore: AngularFirestore) { }
+  constructor(private router: Router, private firestore: AngularFirestore, private modalController: ModalController, private platform: Platform) { }
 
   ngOnInit() {
     this.loadGoogleMaps().then(() => {
       this.initMap();
     });
+
+    if (this.platform.is('capacitor')){
+      BarcodeScanner.isSupported().then()
+      BarcodeScanner.checkPermissions().then()
+      BarcodeScanner.removeAllListeners();
+    }
+
   }
 
   ngAfterViewInit() { }
@@ -114,7 +123,31 @@ export class UserHomePage implements OnInit {
 
   /* ---- Scan QR Code ----- */
 
-  async startScan() {
+  async startScan(){
+    const modal = await this.modalController.create({
+      component: BarcodeScanningModalComponent,
+      cssClass: 'barcode-scanner-modal',
+      showBackdrop: false,
+      componentProps: {
+        formats: [],
+        LensFacing: LensFacing.Back
+      },
+      presentingElement: await this.modalController.getTop()
+    });
     
+
+    await modal.present();
+
+    // RESULTADO DE SCANEO
+
+    const {data} = await modal.onDidDismiss();
+
+    // SI SE OBTIENE INFO EN DATA
+
+    if (data?.barcode?.displayValue){
+      this.codigoEscaneado = data.barcode.displayValue;
+      console.log(this.codigoEscaneado);
+    }
   }
+  
 }
