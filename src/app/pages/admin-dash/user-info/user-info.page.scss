@@ -1,0 +1,25 @@
+.user-info-card {
+    ion-card-header {
+      display: flex;
+      align-items: center;
+      ion-avatar {
+        margin-right: 15px;
+      }
+    }
+
+    ion-card-title {
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    ion-card-subtitle {
+      font-size: 1em;
+      color: var(--ion-color-medium);
+    }
+
+    img {
+        margin: 10px 0;
+        margin-top: 20px;
+        border-radius: 100%;
+    }
+  }

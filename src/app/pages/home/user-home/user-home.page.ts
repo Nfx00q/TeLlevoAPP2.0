@@ -3,9 +3,10 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
 import { BarcodeScanner, LensFacing, ScanResult } from '@capacitor-mlkit/barcode-scanning';
 import { Geolocation } from '@capacitor/geolocation';
-import { ModalController, Platform } from '@ionic/angular';
+import { MenuController, ModalController, Platform } from '@ionic/angular';
 import { Viajes } from 'src/app/interfaces/viajes';
 import { BarcodeScanningModalComponent } from './barcode-scanning-modal.component';
+import { AuthServiceService } from 'src/app/services/auth-service.service';
 
 declare var google: any;
 
@@ -16,6 +17,10 @@ declare var google: any;
 })
 
 export class UserHomePage implements OnInit {
+
+  /* ----- Obtener USUARIOS (Conductores disponibles) ------ */ 
+
+  usuarios: any[] = [];
 
   /* ----- Info del viaje SCANEADO ------ */
 
@@ -34,12 +39,16 @@ export class UserHomePage implements OnInit {
     { lat: -33.56692284768454, lng: -70.63052933119687, icon: 'assets/icon/stop.png', label: 'TL-3 / Av. Observatorio & Av. Sta. Rosa' },
   ]
 
-  constructor(private router: Router, private firestore: AngularFirestore, private modalController: ModalController, private platform: Platform) { }
+  constructor(private router: Router, 
+    private firestore: AngularFirestore, 
+    private modalController: ModalController, 
+    private platform: Platform, 
+    private menuController: MenuController,
+    private authService: AuthServiceService) { }
 
   ngOnInit() {
-    this.loadGoogleMaps().then(() => {
-      this.initMap();
-    });
+    this.getUsers();
+    this.menuController.enable(false);
 
     if (this.platform.is('capacitor')){
       BarcodeScanner.isSupported().then()
@@ -50,6 +59,12 @@ export class UserHomePage implements OnInit {
   }
 
   ngAfterViewInit() { }
+
+  getUsers() {
+    this.authService.getUsers().subscribe(users => {
+      this.usuarios = users;
+    });
+  }
 
   async initMap() {
 
@@ -149,5 +164,8 @@ export class UserHomePage implements OnInit {
       console.log(this.codigoEscaneado);
     }
   }
-  
+
+  joinTrip(){
+    
+  }
 }

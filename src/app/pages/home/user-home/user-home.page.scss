@@ -14,13 +14,21 @@
     h1 {
       color: white;
     }
+
+    ion-card {
+      --background: transparent;
+    }
+
+    ion-card-content {
+      --background: transparent;
+    }
   
     ion-item {
       --background: transparent;
-      color: white;
+      color: rgb(255, 255, 255);
   
       :hover {
-        color: white;
+        color: rgb(255, 255, 255);
         --background: transparent;
       }
     }
@@ -30,6 +38,12 @@
       padding: 5px 10px;
       font-size: 12px;
       text-align: center;
+    }
+  }
+
+  .inner-item {
+    :hover {
+      transition: 0;
     }
   }
 

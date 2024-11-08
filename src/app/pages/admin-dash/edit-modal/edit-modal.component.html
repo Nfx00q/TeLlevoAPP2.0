@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Editar Usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form #editUserForm="ngForm" (ngSubmit)="enviar()">
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input [(ngModel)]="updatedData.nombre" name="nombre" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Apellido</ion-label>
+      <ion-input [(ngModel)]="updatedData.apellido" name="apellido" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Email</ion-label>
+      <ion-input type="email" [(ngModel)]="updatedData.email" name="email" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Tipo</ion-label>
+      <ion-select [(ngModel)]="updatedData.tipo" name="tipo" required>
+        <ion-select-option value="admin">Administrador</ion-select-option>
+        <ion-select-option value="usuario">Usuario</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Deshabilitado</ion-label>
+      <ion-toggle [(ngModel)]="updatedData.disabled" name="disabled"></ion-toggle>
+    </ion-item>
+    <ion-button expand="full" type="submit">Actualizar</ion-button>
+  </form>
+</ion-content>
