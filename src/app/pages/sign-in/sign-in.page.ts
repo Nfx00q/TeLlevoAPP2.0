@@ -76,17 +76,28 @@ export class SignInPage implements OnInit {
           apellido: this.registerForm.get('lastName')?.value,
           email: user.email,
           pass: pass,
-          tipo: tipoCuenta // Guardar el tipo de cuenta (usuario o conductor)
+          tipo: tipoCuenta
         });
   
         Swal.fire({
           icon: 'success',
           title: 'Registro exitoso!',
           text: 'Cuenta registrada con éxito.',
-          confirmButtonText: 'Iniciar sesión',
+          confirmButtonText: 'OK',
           heightAuto: false
         }).then(() => {
-          this.router.navigate(['/log-in']);
+          if (tipoCuenta === 'conductor') {
+            Swal.fire({
+              icon: 'info',
+              title: 'Registra tu vehiculo',
+              text: 'Debes registrar un vehiculo a tu cuenta antes de comenzar',
+              confirmButtonText: 'Registrar vehiculo',
+              heightAuto: false
+            });
+            this.router.navigate(['/sign-car', { uid: user.uid }]);
+          } else {
+            this.router.navigate(['/log-in']);
+          }
         });
       }
   

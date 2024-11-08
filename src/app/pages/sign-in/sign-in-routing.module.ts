@@ -7,7 +7,11 @@ const routes: Routes = [
   {
     path: '',
     component: SignInPage
+  },  {
+    path: 'sign-car',
+    loadChildren: () => import('./sign-car/sign-car.module').then( m => m.SignCarPageModule)
   }
+
 ];
 
 @NgModule({

@@ -15,9 +15,7 @@
 
     <div id="map" class="map"></div>
 
-    <div id="time-estimate" class="time-estimate"><span id="duration">--</span></div>
-
-    <ion-fab slot="fixed" vertical="bottom" horizontal="start">
+    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
       <ion-fab-button color="dark">
         <ion-icon name="add"></ion-icon>
       </ion-fab-button>
@@ -37,9 +35,9 @@
     <ng-template>
       <ion-content>
         <h1 style="text-align: center;">Escanear QR</h1>
-        <p>Escanea el codigo generado por un conductor para acceder a la informacion del viaje.</p>
+        <p>Escanea el codigo generado por un conductor para unirte al viaje.</p>
 
-        <ion-button expand="block" color="light" (click)="startScan()">
+        <ion-button expand="block" color="light" (click)="startScan()" style="margin: 0 20px;">
           Escanear QR
         </ion-button>
         
