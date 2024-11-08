@@ -17,12 +17,10 @@ import Swal from 'sweetalert2';
 export class LogInPage implements OnInit {
 
   /* ----- DEFINIR LOGIN ----- */
-  
   loginForm: FormGroup;
   resetForm: FormGroup;
 
   /* ----- DEFINIR VALORES DE INPUT ----- */
-  
   emailValue: string = '';
   passValue: string = '';
 
@@ -144,6 +142,48 @@ export class LogInPage implements OnInit {
     } finally {
         loading.dismiss();
     }
+  }
+
+  /* ---- Google Login ---- */
+  async logInWithGoogle() {
+    try {
+      const result = await this.authService.googleLogin();
+      if (result.user) {
+        this.handleUserLogin(result.user.uid, result.user.email);
+      }
+    } catch (error) {
+      console.error('Error en el inicio de sesión con Google:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema al iniciar sesión con Google.',
+        confirmButtonText: 'OK',
+        heightAuto: false,
+      });
+    }
+  }
+
+  /* ---- GitHub Login ---- */
+  async logInWithGitHub() {
+    try {
+      const result = await this.authService.githubLogin();
+      if (result.user) {
+        this.handleUserLogin(result.user.uid, result.user.email);
+      }
+    } catch (error) {
+      console.error('Error en el inicio de sesión con GitHub:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema al iniciar sesión con GitHub.',
+        confirmButtonText: 'OK',
+        heightAuto: false,
+      });
+    }
+    
+  }
+  handleUserLogin(uid: string, email: string | null) {
+    throw new Error('Method not implemented.');
   }
 
   /* ----- Reset PASSWORD ----- */

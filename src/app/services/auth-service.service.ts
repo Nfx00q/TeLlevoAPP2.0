@@ -6,18 +6,33 @@ import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { Usuario } from '../interfaces/usuario';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
+import firebase from 'firebase/compat/app';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthServiceService {
+  isLogged() {
+    throw new Error('Method not implemented.');
+  }
 
   constructor(
+    private afAuth: AngularFireAuth,
     private angularFireAuth : AngularFireAuth, 
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private router: Router
   ){}
+   // Método para iniciar sesión con Google
+   googleLogin() {
+    return this.afAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  }
+  // Método para iniciar sesión con GitHub
+  githubLogin() {
+    return this.afAuth.signInWithPopup(new firebase.auth.GithubAuthProvider());
+  }
+
 
   getUsers(): Observable<Usuario[]> { // Cambiar a Usuario[]
     return this.firestore.collection<Usuario>('usuarios').valueChanges();
