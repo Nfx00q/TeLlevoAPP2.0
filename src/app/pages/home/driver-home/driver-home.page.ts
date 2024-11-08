@@ -26,9 +26,14 @@ export class DriverPage implements OnInit, AfterViewInit {
 
   /*----UBICACION-------*/
 
-  codigoViaje: string = '';
+  
   ubicacionInicio: string | null = null;
   ubicacionDestino: string | null = null;
+
+  /* ---- VIAJE ---- */
+
+  costoViaje: string = '';
+  codigoViaje: string = '';
 
   /* ------ USUARIO ------ */
 
@@ -344,9 +349,9 @@ export class DriverPage implements OnInit, AfterViewInit {
               nom_destino: destino.label,
               nom_inicio: inicio.label,
               fecha: new Date().toISOString(),
-              nom_pasajero: this.nombreUsuario ?? 'Desconocido',
               coordenada: JSON.stringify(pos),
               coordenada_destino: JSON.stringify({ lat: destino.lat, lng: destino.lng }),
+              costo_perperson: this.costoViaje
             };
   
             console.log(`Trip created successfully. Trip code: ${this.codigoViaje}`);
@@ -371,6 +376,24 @@ export class DriverPage implements OnInit, AfterViewInit {
       } else {
         console.log('Please select both locations.');
       }
+    }
+  }
+
+  /* ---- COSTO VIAJE ------ */
+
+  formatCurrency(event: any) {
+    // Solo permite números
+    let input = event.target.value.replace(/\D/g, '');
+    
+    // Aplica formato chileno
+    this.costoViaje = input ? `$ ${new Intl.NumberFormat('es-CL').format(Number(input))}` : '';
+  }
+
+  preventNonNumeric(event: KeyboardEvent) {
+    const charCode = event.which ? event.which : event.keyCode;
+    // Permite solo números (0-9)
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
     }
   }
 

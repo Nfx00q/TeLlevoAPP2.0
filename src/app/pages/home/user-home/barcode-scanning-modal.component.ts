@@ -54,7 +54,6 @@ import { IonicModule } from '@ionic/angular';
     `
       ion-content {
         --background: transparent;
-        
       }
 
       .square {
@@ -101,10 +100,16 @@ export class BarcodeScanningModalComponent
   }
 
   public ngOnDestroy(): void {
+    this.removeBarcodeScannerClass();
     this.stopScan();
   }
 
+  private removeBarcodeScannerClass() {
+    document.body.classList.remove('barcode-scanner-active');
+  }
+
   public async closeModal(barcode?: Barcode): Promise<void> {
+    this.removeBarcodeScannerClass();
     this.modalController.dismiss({ barcode });
   }
 
@@ -181,4 +186,5 @@ export class BarcodeScanningModalComponent
 
     await BarcodeScanner.stopScan();
   }
+  
 }

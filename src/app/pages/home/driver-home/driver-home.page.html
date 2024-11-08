@@ -15,8 +15,6 @@
 
     <div id="map" class="map"></div>
 
-    <div id="time-estimate" class="time-estimate"><span id="duration">--</span></div>
-
     <ion-fab slot="fixed" vertical="bottom" horizontal="start">
       <ion-fab-button color="dark">
         <ion-icon name="add"></ion-icon>
@@ -40,7 +38,7 @@
         <p>Selecciona tu ubicación de inicio y destino para comenzar a buscar un conductor cercano.</p>
   
         <ion-item lines="none">
-          <ion-select [(ngModel)]="ubicacionInicio" (ionChange)="onInicioChange()" label="Ubicación inicio" label-placement="stacked">
+          <ion-select [(ngModel)]="ubicacionInicio" (ionChange)="onInicioChange()" label="Ubicación inicio" label-placement="stacked" required>
             <ion-select-option *ngFor="let ubicacion of ubicaciones" [value]="ubicacion.value">
               {{ ubicacion.label }}
             </ion-select-option>
@@ -48,13 +46,18 @@
         </ion-item>
         
         <ion-item lines="none">
-          <ion-select [(ngModel)]="ubicacionDestino" label="Ubicación destino" label-placement="stacked">
+          <ion-select [(ngModel)]="ubicacionDestino" label="Ubicación destino" label-placement="stacked" required>
             <ion-select-option *ngFor="let ubicacion of getOpcionesDestino()" [value]="ubicacion.value">
               {{ ubicacion.label }}
             </ion-select-option>
           </ion-select>
         </ion-item>
-  
+
+        <ion-item lines="none">
+          <ion-label position="stacked">Costo del viaje</ion-label>
+          <ion-input [(ngModel)]="costoViaje" placeholder="0" (ionInput)="formatCurrency($event)" (keypress)="preventNonNumeric($event)" required></ion-input>
+        </ion-item>
+        
         <ion-grid>
           <ion-row>
             <ion-col size="9">
