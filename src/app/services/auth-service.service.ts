@@ -13,6 +13,7 @@ import firebase from 'firebase/compat/app';
   providedIn: 'root'
 })
 export class AuthServiceService {
+  
   isLogged() {
     throw new Error('Method not implemented.');
   }
@@ -24,10 +25,12 @@ export class AuthServiceService {
     private storage: AngularFireStorage,
     private router: Router
   ){}
-   // Método para iniciar sesión con Google
+
+  // Método para iniciar sesión con Google
    googleLogin() {
     return this.afAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
   }
+
   // Método para iniciar sesión con GitHub
   githubLogin() {
     return this.afAuth.signInWithPopup(new firebase.auth.GithubAuthProvider());
