@@ -1,16 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-buttons slot="secondary">
-      <ion-button>
-        <ion-icon slot="icon-only" name="search"></ion-icon>
-      </ion-button>
-    </ion-buttons>
     <ion-buttons slot="end">
       <ion-button (click)="logout()">
         <ion-icon slot="icon-only" name="log-out"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Usuarios</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -22,7 +16,7 @@
           <ion-label>
             <h2><b>{{ usuario.nombre }} {{ usuario.apellido }}</b></h2>
             <p style="font-size: 10px;">({{ usuario.uid }})</p>
-            <p class="user-type">Tipo: {{ usuario.tipo }}</p>
+            <p class="user-type" style="text-transform: capitalize;">{{ usuario.tipo }}</p>
           </ion-label>
         </ion-item>
 

@@ -27,7 +27,6 @@ export class ConfigPagePage implements OnInit {
         // Obtener los datos del usuario desde Firestore
         this.authService.getUserData(user.uid).subscribe(userData => {
           this.usuario = userData;
-          console.log("Datos del usuario:", this.usuario);
         });
       } else {
         console.error("No se encontró un usuario autenticado.");

@@ -26,12 +26,13 @@
       <ion-select [(ngModel)]="updatedData.tipo" name="tipo" required>
         <ion-select-option value="admin">Administrador</ion-select-option>
         <ion-select-option value="usuario">Usuario</ion-select-option>
+        <ion-select-option value="conductor">Conductor</ion-select-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Deshabilitado</ion-label>
       <ion-toggle [(ngModel)]="updatedData.disabled" name="disabled"></ion-toggle>
     </ion-item>
-    <ion-button expand="full" type="submit">Actualizar</ion-button>
+    <ion-button expand="block" color="dark" type="submit" style="margin: 0 10px;">Actualizar</ion-button>
   </form>
 </ion-content>

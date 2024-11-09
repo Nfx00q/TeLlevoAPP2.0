@@ -43,6 +43,10 @@ const routes: Routes = [
   {
     path: 'sign-car',
     loadChildren: () => import('./pages/sign-in/sign-car/sign-car.module').then( m => m.SignCarPageModule)
+  },
+  {
+    path: 'user-info',
+    loadChildren: () => import('./pages/admin-dash/user-info/user-info.module').then( m => m.UserInfoPageModule)
   }
 ];
 

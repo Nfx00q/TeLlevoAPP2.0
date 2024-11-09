@@ -14,8 +14,8 @@ import firebase from 'firebase/compat/app';
 })
 export class AuthServiceService {
   
-  isLogged() {
-    throw new Error('Method not implemented.');
+  isLogged(): Observable<any> {
+    return this.angularFireAuth.authState; 
   }
 
   constructor(
@@ -35,7 +35,6 @@ export class AuthServiceService {
   githubLogin() {
     return this.afAuth.signInWithPopup(new firebase.auth.GithubAuthProvider());
   }
-
 
   getUsers(): Observable<Usuario[]> { // Cambiar a Usuario[]
     return this.firestore.collection<Usuario>('usuarios').valueChanges();

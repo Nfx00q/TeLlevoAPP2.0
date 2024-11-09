@@ -42,7 +42,7 @@ export class AdminDashPage implements OnInit {
 
   async logout(){
     this.authService.logOut();
-    this.router.navigate(['/login'])
+    this.router.navigate(['/log-in'])
   }
 
   async editarUsuario(usuario: any) {

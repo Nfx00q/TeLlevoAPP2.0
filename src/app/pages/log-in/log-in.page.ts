@@ -44,38 +44,6 @@ export class LogInPage implements OnInit {
 
   ngOnInit() {
     this.menuController.enable(false);
-    
-    try {
-      const usuarioLogin = localStorage.getItem('usuarioLogin');
-      
-      if (usuarioLogin) {
-        const usuarioData = JSON.parse(usuarioLogin);
-
-        this.firestore.collection('usuarios').doc(usuarioData.uid).get().toPromise().then(async doc => {
-          const data = doc?.data() as Usuario;
-
-          const loading = await this.loadingController.create({
-            message: 'Sesion detectada',
-            duration: 2000
-          });
-
-          (await loading).present();
-  
-          if (data) {
-            if (data.tipo === 'admin') {
-              this.router.navigate(['/admin-dash']);
-            } else if (data.tipo === 'usuario') {
-              this.router.navigate(['/user-home']);
-            } else if (data.tipo === 'conductor') {
-              this.router.navigate(['/driver-home']);
-            }
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error al parsear usuarioLogin:', error);
-      localStorage.removeItem('usuarioLogin');
-    }
   }
   
   /* ----- LOGIN ----- */
