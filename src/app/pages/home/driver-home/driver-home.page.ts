@@ -236,7 +236,7 @@ export class DriverPage implements OnInit, AfterViewInit {
                   // Display the estimated time in your HTML element with ID 'duration'
                   const durationElement = document.getElementById('duration');
                   if (durationElement) {
-                    durationElement.innerText = `Estimated travel time: ${durationText}`;
+                    durationElement.innerText = `${durationText}`;
                   }
                   console.log(`Estimated travel time: ${durationText}`);
                 } else {
@@ -410,5 +410,8 @@ export class DriverPage implements OnInit, AfterViewInit {
   goToConfig() {
     this.router.navigate(['/config-page']);
   }
+
+  /* ---- AUTOCOMPLETADO ----- */
+  
 
 }

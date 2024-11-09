@@ -1,45 +1,60 @@
 <ion-content>
-  <div class="box-centered">
-    <ion-card class="login-card">
-      <ion-card-header>
-        <h1>Te Llevo APP</h1>
-        <p>Registra tu usuario y comienza a viajar de forma segura</p>
-      </ion-card-header>
-      <ion-card-content [formGroup]="registerForm">
-        <div class="input-container">
-          <input formControlName="firstName" type="text" placeholder="Nombre" />
-          <input formControlName="lastName" type="text" placeholder="Apellido" />
-        </div>
-        <div class="input-container">
-          <input formControlName="email" type="email" placeholder="Correo electrónico" />
-        </div>
-        <div class="input-container">
-          <input formControlName="pass" type="password" placeholder="Contraseña" />
-        </div>
-        <div class="input-container">
-          <input formControlName="repass" type="password" placeholder="Repite la contraseña" />
-        </div>
+  <body style="background-color: rgb(29, 29, 29);">
+    <div class="box-centered">
+      <ion-card class="login-card">
+        <ion-card-header>
+          <h1>Te Llevo APP</h1>
+          <p>Registra tu cuenta y comienza a viajar de forma segura</p>
+        </ion-card-header>
+        <ion-card-content [formGroup]="registerForm">
+          <div class="input-container">
+            <ion-grid style="padding: 0;">
+              <ion-row>
+                <ion-col style="padding: 0;">
+                  <input formControlName="firstName" type="text" placeholder="Nombre" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" /> 
+                </ion-col>
+                <ion-col style="padding: 0;">
+                  <input formControlName="lastName" type="text" placeholder="Apellido" style="border-top-left-radius: 0; border-bottom-left-radius: 0;"/>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+          <div class="input-container">
+            <input formControlName="email" type="email" placeholder="Correo electrónico" />
+          </div>
+          <div class="input-container">
+            <input formControlName="pass" type="password" placeholder="Contraseña" />
+          </div>
+          <div class="input-container">
+            <input formControlName="repass" type="password" placeholder="Repite la contraseña" />
+          </div>
 
-        <!-- Cambia ngModel por formControlName en el ion-segment -->
-        <ion-segment formControlName="tipoCuenta" lines="none" style="margin-bottom: 10px;" color="dark">
-          <ion-segment-button value="usuario" style="font-size: 12px;">
-            <ion-label>Usuario</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="conductor" style="font-size: 12px;">
-            <ion-label>Conductor</ion-label>
-          </ion-segment-button>
-        </ion-segment>
+          <ion-segment formControlName="tipoCuenta" lines="none" style="margin-bottom: 10px;" color="light">
+            <ion-segment-button value="usuario" style="font-size: 12px;">
+              <ion-label style="color: white;">Usuario</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="conductor" style="font-size: 12px;">
+              <ion-label style="color: white;">Conductor</ion-label>
+            </ion-segment-button>
+          </ion-segment>
 
-        <ion-button size="block" (click)="register()" color="dark">
-          Registrar cuenta
-        </ion-button>
-        <ion-button size="block" (click)="goToLogin()" color="light">
-          Tengo una cuenta
-        </ion-button>
-
-        <ion-button size="block" (click)="generateRandomUsers(10)" color="dark">10 Random Users</ion-button>
-
-      </ion-card-content>
-    </ion-card>
-  </div>
+          <ion-grid style="padding: 0;">
+            <ion-row style="padding: 0;">
+              <ion-col size="9" style="padding: 0;">
+                <ion-button size="block" (click)="register()" color="medium">
+                  Registrarme
+                </ion-button>
+              </ion-col>
+              <ion-col size="3" style="padding: 0;">
+                <ion-button size="block" (click)="goToLogin()" color="light">
+                  <ion-icon name="log-in-outline"></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+      <p style="text-align: center;"><label (click)="generateRandomUsers(10)" style="color: white;">Generar Usuarios (10)</label></p>
+    </div>
+  </body>
 </ion-content>

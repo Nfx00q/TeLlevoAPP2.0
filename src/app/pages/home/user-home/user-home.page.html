@@ -31,36 +31,37 @@
 
   </body>
 
-  <ion-modal #modal trigger="op-modal" [initialBreakpoint]="0.3" [breakpoints]="[0.85]" class="iniciarViaje">
+  <ion-modal #modal trigger="op-modal" [initialBreakpoint]="[0.3]" [breakpoints]="[0.3, 0.85]" class="iniciarViaje">
     <ng-template>
       <ion-content>
-
         <h1 style="text-align: center;">Selecciona un conductor</h1>
         <p>Selecciona un conductor de tu preferencia para unirte a un viaje.</p>
-
-        <ion-card *ngFor="let usuario of usuarios" class="user-item" [button]="true" (click)="joinTrip()">
-          <ion-card-content *ngIf="usuario.tipo === 'conductor' && usuario.activo === true" class="inner-item">
-            <ion-item lines="none">
-              <ion-avatar slot="start">
-                <img [src]="usuario.img_usuario || 'assets/usuarios/default-user.png'" alt="{{ usuario.nombre }} {{ usuario.apellido }}">
-              </ion-avatar>
-              <ion-label>
-                <h3><b>{{ usuario.nombre }} {{ usuario.apellido }}</b></h3>
-                <ion-label *ngIf="usuario.activo === true" style="color: rgba(150, 255, 2, 0.68); text-transform: capitalize; font-size: 10px;">
-                  {{ usuario.activo }}
+  
+        <ion-list class="driversList">
+          <div *ngFor="let usuario of usuarios">
+            <ng-container *ngIf="usuario.tipo === 'conductor' && usuario.activo">
+              <ion-item lines="none" (click)="joinTrip()" class="clickable-item">
+                <ion-avatar slot="start">
+                  <img [src]="usuario.img_usuario || 'assets/usuarios/default-user.png'" alt="{{ usuario.nombre }} {{ usuario.apellido }}">
+                </ion-avatar>
+                <ion-label>
+                  <h3><b>{{ usuario.nombre }} {{ usuario.apellido }}</b></h3>
+                  <label style="color: rgba(150, 255, 2, 0.68); font-size: 10px; text-align: left;">
+                    Activo
+                  </label>
                 </ion-label>
-              </ion-label>
-            </ion-item>
-          </ion-card-content>
-        </ion-card>        
-
+              </ion-item>
+            </ng-container>
+          </div>
+        </ion-list>                
+  
         <h1 style="text-align: center;">o Escanea un QR</h1>
         <p>Escanea el codigo generado por un conductor para unirte al viaje.</p>
-
+  
         <ion-button expand="block" color="light" (click)="startScan()" style="margin: 0 20px;">
+          <ion-icon name="qr-code-outline" slot="start"></ion-icon>
           Escanear QR
         </ion-button>
-        
       </ion-content>
     </ng-template>
   </ion-modal>

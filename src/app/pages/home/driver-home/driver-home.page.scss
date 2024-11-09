@@ -7,6 +7,20 @@
     height: 100vh;
 }
 
+
+#duration {
+  position: absolute;
+  z-index: 2;
+  top: 15px;
+  left: 15px;
+
+  background-color: rgba(0,0,0,.5);
+  color: white;
+
+  border-radius: 5px;
+  padding: 5px;
+}
+
 .userTripQR {
     display: block;
     text-align: center;

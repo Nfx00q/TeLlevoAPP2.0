@@ -14,14 +14,6 @@
     h1 {
       color: white;
     }
-
-    ion-card {
-      --background: transparent;
-    }
-
-    ion-card-content {
-      --background: transparent;
-    }
   
     ion-item {
       --background: transparent;
@@ -41,10 +33,21 @@
     }
   }
 
-  .inner-item {
-    :hover {
-      transition: 0;
-    }
+  .driversList {
+    --background: transparent;
+    background-color: rgb(20,20,20);
+    padding: 0;
+  }
+
+  .clickable-item {
+    transition: .5s;
+    cursor: grab;
+    user-select: none;
+  }
+  .clickable-item:hover {
+    background-color: transparent;
+    transition: .5s;
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
 // Hide all elements

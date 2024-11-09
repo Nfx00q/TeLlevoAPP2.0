@@ -13,4 +13,6 @@ export interface Viajes {
     nom_conductor?: string;
     color_veh?: string;
     marca_veh?: string;
+
+    conductorId?: string;
 }

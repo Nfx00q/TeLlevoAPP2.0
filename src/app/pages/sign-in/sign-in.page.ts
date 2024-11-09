@@ -126,25 +126,23 @@ export class SignInPage implements OnInit {
   async generateRandomUsers(count: number) {
     try {
       const response = await axios.get(`https://randomuser.me/api/?results=${count}`);
-      const users: Usuario[] = response.data.results.map((user: any) => { // Aquí se define el tipo `any`
+      const users: Usuario[] = response.data.results.map((user: any) => {
         // Generar un role aleatorio
-        const roles: Usuario['role'][] = ["usuario", "conductor", "admin"];
-        const randomRole = roles[Math.floor(Math.random() * roles.length)];
+        const tipos: Usuario['tipo'][] = ["usuario", "conductor", "admin"];
+        const randomRole = tipos[Math.floor(Math.random() * tipos.length)];
   
         return {
           nombre: user.name.first,
           apellido: user.name.last,
-          rut: user.id.value, // Suponiendo que la API devuelve un valor de RUT
+          rut: user.id.value,
           telefono: user.phone,
-          edad: this.calculateAge(user.dob.date), // Calcular edad a partir de la fecha de nacimiento
-          role: randomRole,
+          edad: this.calculateAge(user.dob.date), 
           email: user.email,
-          pass: 'defaultPassword', // Puedes generar una contraseña aleatoria si lo deseas
-          tipo: randomRole, // Puedes asignar el mismo valor que role, si así lo deseas
-          disabled: false, // Por defecto, deshabilitado en false
+          pass: '123456',
+          tipo: randomRole,
+          disabled: false,
         };
       });
-  
       this.saveUsersToFirebase(users);
     } catch (error) {
       console.error('Error al obtener usuarios: ', error);
@@ -155,12 +153,19 @@ export class SignInPage implements OnInit {
     const batch = this.firestore.firestore.batch();
   
     users.forEach(user => {
-      const userRef = this.firestore.collection('usuarios').doc().ref; // Usar .ref para obtener DocumentReference
+      const userRef = this.firestore.collection('usuarios').doc().ref;
       batch.set(userRef, user);
     });
   
     batch.commit()
       .then(() => {
+        Swal.fire({
+          icon: 'info',
+          title: 'Usuarios creados',
+          text: '10 Usuarios creados en la Base de Datos',
+          confirmButtonText: 'Cerrar',
+          heightAuto: false,
+        });
         console.log('Usuarios guardados exitosamente');
       })
       .catch(error => {

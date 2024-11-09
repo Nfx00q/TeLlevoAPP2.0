@@ -1,11 +1,11 @@
 <ion-content>
-  <body>
+  <body style="background-color: rgb(29, 29, 29);">
     <div class="box-centered">
       <ion-card class="login-card">
-        <ion-card-header>
-          <h1>Te Llevo APP</h1>
-          <p>Seguridad y eficiencia al alcance de un toque</p>
-        </ion-card-header>
+        <ion-header>
+          <h1>Inicio de sesion</h1>
+          <p>Ingresa tu correo y<br>contraseña para ingresar</p>
+        </ion-header>
         <ion-card-content [formGroup]="loginForm">
           <div class="input-container">
             <input formControlName="email" [(ngModel)]="emailValue" type="email" placeholder="Correo electrónico" class="custom-input"/>
@@ -13,34 +13,36 @@
           <div class="input-container">
             <input formControlName="pass" [(ngModel)]="passValue" type="password" placeholder="Contraseña" class="custom-input"/>
           </div>
-          <ion-button expand="block" color="dark" (click)="logIn()">
-            Iniciar sesión
-          </ion-button>
-          
-          <ion-button expand="block" color="light" (click)="goToRegister()">
-            No tengo cuenta
+
+          <ion-grid style="padding: 0;">
+            <ion-row style="padding: 0;">
+              <ion-col size="9" style="padding: 0;">
+                <ion-button expand="block" color="light" (click)="logIn()">
+                  Iniciar sesión
+                </ion-button>
+              </ion-col>
+              <ion-col size="3" style="padding: 0;">
+                <ion-button expand="block" color="medium" (click)="goToRegister()">
+                  <ion-icon name="person-add-outline"></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <ion-button color="warning" (click)="logInWithGoogle()" size="block" style="margin-top: 20px;">
+            Iniciar con Google
+            <ion-icon name="logo-google" slot="end"></ion-icon>
           </ion-button>
 
-          <ion-button id="open-modal" expand="block" color="warning">
-            Olvidé mi clave
+          <ion-button color="dark" (click)="logInWithGitHub()" size="block" style="margin-top: 10px;">
+            Iniciar con Github
+            <ion-icon name="logo-github" slot="end"></ion-icon>
           </ion-button>
-          
-          <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-            <ion-fab-button color="dark" (click)="logInWithGoogle()">
-              <ion-icon name="logo-google"></ion-icon>
-            </ion-fab-button>
-          </ion-fab>
-          
-          <ion-fab vertical="bottom" horizontal="start" slot="fixed">
-            <ion-fab-button color="dark" (click)="logInWithGitHub()">
-              <ion-icon name="logo-github"></ion-icon>
-            </ion-fab-button>
-          </ion-fab>
-
-          
 
         </ion-card-content>
       </ion-card>
+
+      <p style="text-align: center;"><a href="" id="open-modal" style="color: white; text-decoration: none;">Olvidé mi clave</a></p>
       
     </div>
   </body>

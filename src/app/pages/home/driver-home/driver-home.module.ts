@@ -15,7 +15,7 @@ import { QRCodeModule } from 'angularx-qrcode';
     FormsModule,
     IonicModule,
     DriverHomePageRoutingModule,
-    QRCodeModule
+    QRCodeModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [DriverPage]

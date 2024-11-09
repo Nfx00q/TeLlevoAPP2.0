@@ -50,12 +50,15 @@ export class UserHomePage implements OnInit {
     this.getUsers();
     this.menuController.enable(false);
 
+    this.loadGoogleMaps().then(() => {
+      this.initMap();
+    });
+
     if (this.platform.is('capacitor')){
       BarcodeScanner.isSupported().then()
       BarcodeScanner.checkPermissions().then()
       BarcodeScanner.removeAllListeners();
     }
-
   }
 
   ngAfterViewInit() { }
@@ -66,55 +69,70 @@ export class UserHomePage implements OnInit {
     });
   }
 
-  async initMap() {
+  /* ----- INICIALIZAR MAPA ----- */
 
+  async initMap() {
     const mapOptions = {
-      center: { lat: -33.59841000351409, lng: -70.57834513910244 },
-      zoom: 13,
-      disableDefaultUI: true,
-      styles: [
-        { featureType: "poi", stylers: [{ visibility: "off" }] },
-        { featureType: "road", stylers: [{ visibility: "on" }] },
-      ],
+        center: { lat: -33.59841000351409, lng: -70.57834513910244 },
+        zoom: 13,
+        disableDefaultUI: true,
+        styles: [
+            { featureType: "poi", stylers: [{ visibility: "off" }] },
+            { featureType: "road", stylers: [{ visibility: "on" }] },
+        ],
     };
 
+    // Inicializa el mapa y los servicios de direcciones
     this.map = new google.maps.Map(document.getElementById('map'), mapOptions);
     this.directionsService = new google.maps.DirectionsService();
-    this.directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+    this.directionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: true,
+        polylineOptions: { strokeColor: '#242424', strokeWeight: 5 },
+    });
     this.directionsRenderer.setMap(this.map);
 
     try {
-      const position = await Geolocation.getCurrentPosition();
-      const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
+        // Obtiene la ubicación actual del usuario usando Capacitor
+        const position = await Geolocation.getCurrentPosition();
+        const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
 
-      new google.maps.Marker({
-        position: pos,
-        map: this.map,
-        title: "Tu ubicación actual",
-        icon: { url: 'assets/icon/ubi.png', scaledSize: new google.maps.Size(50, 50) },
-      });
-      this.map.setCenter(pos);
+        // Agrega el marcador de ubicación actual
+        new google.maps.Marker({
+            position: pos,
+            map: this.map,
+            title: "Tu ubicación actual",
+            icon: { url: 'assets/icon/ubi.png', scaledSize: new google.maps.Size(50, 50) },
+        });
+        this.map.setCenter(pos);
     } catch (error) {
-      console.error("Error al obtener la ubicación:", error);
-      alert("No se pudo obtener la ubicación actual.");
+        console.error("Error al obtener la ubicación:", error);
+        alert("No se pudo obtener la ubicación actual.");
     }
 
+    // Agrega marcadores personalizados para cada ubicación en `ubicaciones`
     this.ubicaciones.forEach((ubicacion) => {
-      const marker = new google.maps.Marker({
-        position: { lat: ubicacion.lat, lng: ubicacion.lng },
-        map: this.map,
-        icon: {
-          url: `${ubicacion.icon}?t=${new Date().getTime()}`,
-          scaledSize: new google.maps.Size(40, 40),
-        },
-        title: ubicacion.label,
-      });
+        const marker = new google.maps.Marker({
+            position: { lat: ubicacion.lat, lng: ubicacion.lng },
+            map: this.map,
+            icon: {
+                url: `${ubicacion.icon}?t=${new Date().getTime()}`, // Evita la cache del icono
+                scaledSize: new google.maps.Size(40, 40),
+            },
+            title: ubicacion.label,
+        });
 
-      const infoWindow = new google.maps.InfoWindow({
-        content: `<p>${ubicacion.label}</p>`,
-      });
-      marker.addListener('click', () => infoWindow.open(this.map, marker));
+        const infoWindow = new google.maps.InfoWindow({
+            content: `<p>${ubicacion.label}</p>`,
+        });
+        marker.addListener('click', () => infoWindow.open(this.map, marker));
     });
+
+    // Configuración de manejo de error de geolocalización
+    function handleLocationError(browserHasGeolocation: boolean, pos: any) {
+        alert(browserHasGeolocation
+            ? "Error: El servicio de geolocalización ha fallado."
+            : "Error: Tu navegador no soporta la geolocalización.");
+    }
   }
 
   loadGoogleMaps(): Promise<any> {
