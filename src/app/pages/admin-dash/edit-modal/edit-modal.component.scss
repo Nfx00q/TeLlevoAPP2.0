@@ -1,0 +1,27 @@
+ion-item:first-child {
+    margin-top: 20px;
+}
+
+.editInput {
+    width: 100%;
+    padding: 10px 10px;
+    border: 0;
+    outline: 0;
+
+    border-radius: 10px;
+
+    background-color: rgba(255, 255, 255, 0.8);
+    color: rgb(0, 0, 0);
+
+    ::placeholder {
+        color: rgb(43, 43, 43);
+    }
+}
+
+ion-content {
+    --background: rgb(24, 24, 24);
+
+    ion-item {
+        --background: transparent;
+    }
+  }

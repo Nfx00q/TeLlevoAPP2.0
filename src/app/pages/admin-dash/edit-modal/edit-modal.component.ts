@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 
 @Component({
@@ -11,7 +12,7 @@ export class EditModalComponent  implements OnInit {
   usuario: any; // El usuario que se va a editar
   updatedData: any = {}; // Para guardar los datos actualizados
 
-  constructor(private modalController: ModalController) {}
+  constructor(private modalController: ModalController, private router: Router) {}
 
   ngOnInit() {
     // Rellena los campos con la información existente

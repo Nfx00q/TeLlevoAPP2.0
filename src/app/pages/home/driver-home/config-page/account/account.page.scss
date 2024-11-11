@@ -1,4 +1,11 @@
+ion-card {
+  box-shadow: none;
+}
+
 .user-info-card {
+    
+    --background: rgb(24,24,24);
+
     ion-card-header {
       display: flex;
       align-items: center;
@@ -10,11 +17,12 @@
     ion-card-title {
       font-size: 1.5em;
       font-weight: bold;
+      color: white;
     }
 
     ion-card-subtitle {
       font-size: 1em;
-      color: var(--ion-color-medium);
+      color: white;
     }
 
     img {
@@ -41,13 +49,44 @@
     right: 10px;
     font-size: 20px;
     color: white;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
     padding: 5px;
     cursor: pointer;
   }
   
   .edit-icon:hover {
     background-color: rgba(0, 0, 0, 0.7);
+}
+
+ion-header {
+  --background: rgb(24,24,24);
+
+  ion-toolbar {
+    --background: rgb(20,20,20);
+  }
+}
+
+ion-list {
+  padding: 0;
+}
+
+ion-content {
+  --background: rgb(24,24,24);
+  color: white;
+
+  ion-card-content h2, ion-card-content p {
+    color: white;
+  }
+
+  ion-input {
+    color: white;
+
+    ::placeholder {
+      color: white;
+    }
+  }
+}
+
+ion-item {
+  --background: rgb(24,24,24);
 }
   

@@ -16,7 +16,7 @@
           <ion-label>
             <h2><b>{{ usuario.nombre }} {{ usuario.apellido }}</b></h2>
             <p style="font-size: 10px;">({{ usuario.uid }})</p>
-            <p class="user-type" style="text-transform: capitalize;">{{ usuario.tipo }}</p>
+            <p class="user-type" style="text-transform: capitalize;">{{ usuario.tipo }} <b *ngIf="usuario.disabled" style="color: rgba(205, 92, 92, 0.733);">(Deshabilitado)</b></p>
           </ion-label>
         </ion-item>
 

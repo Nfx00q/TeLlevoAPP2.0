@@ -77,6 +77,19 @@ export class AdminDashPage implements OnInit {
             this.authService.deleteUser(usuario.uid)
               .then(() => {
                 console.log('Usuario deshabilitado correctamente');
+                
+                // Suscribirse al observable de authState para obtener el usuario actual
+                this.authService.getCurrentUser().subscribe(currentUser => {
+                  if (currentUser?.uid === usuario.uid) {
+                    this.authService.logOut().then(() => {
+                      console.log('Sesión cerrada automáticamente al deshabilitar el usuario');
+                    }).catch((error) => {
+                      console.error('Error al cerrar sesión:', error);
+                    });
+                  }
+                }, (error) => {
+                  console.error('Error al obtener el usuario actual:', error);
+                });
               })
               .catch((error) => {
                 console.error('Error al deshabilitar usuario:', error);
@@ -86,5 +99,5 @@ export class AdminDashPage implements OnInit {
       ]
     });
     await alert.present();
-  }
+  }  
 }

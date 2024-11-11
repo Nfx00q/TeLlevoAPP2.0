@@ -1,0 +1,35 @@
+ion-content {
+    --background: rgb(24,24,24);
+    
+    h1 {
+      color: white;
+    }
+
+    ion-list {
+      --background: transparent;
+      --background: rgb(24,24,24);
+      padding: 0;
+
+      ion-label {
+        color: white;
+      }
+
+      ion-icon {
+        color: white;
+      }
+    }
+
+    ion-item {
+      --background: transparent;
+      --background: rgb(24,24,24);
+      color: white;
+    }
+  }
+ 
+ion-header {
+    --background: rgb(24,24,24);
+
+    ion-toolbar {
+      --background: rgb(20,20,20);
+    }
+  }

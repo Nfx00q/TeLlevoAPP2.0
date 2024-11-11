@@ -1,38 +1,46 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Editar Usuario</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cerrarModal()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content>
+  <h3 style="text-align: center; color: white; margin: 0 10px; margin-top: 30px;">Editar información de {{updatedData.nombre}}</h3>
   <form #editUserForm="ngForm" (ngSubmit)="enviar()">
-    <ion-item>
-      <ion-label position="floating">Nombre</ion-label>
-      <ion-input [(ngModel)]="updatedData.nombre" name="nombre" required></ion-input>
+    <ion-item lines="none">
+      <input class="editInput" [(ngModel)]="updatedData.nombre" name="nombre" required
+             [placeholder]="updatedData.nombre || 'Nombre'">
     </ion-item>
-    <ion-item>
-      <ion-label position="floating">Apellido</ion-label>
-      <ion-input [(ngModel)]="updatedData.apellido" name="apellido" required></ion-input>
+    <ion-item lines="none">
+      <input class="editInput" [(ngModel)]="updatedData.apellido" name="apellido" required
+             [placeholder]="updatedData.apellido || 'Apellido'">
     </ion-item>
-    <ion-item>
-      <ion-label position="floating">Email</ion-label>
-      <ion-input type="email" [(ngModel)]="updatedData.email" name="email" required></ion-input>
+    <ion-item lines="none">
+      <input class="editInput" [(ngModel)]="updatedData.rut" name="rut"
+             [placeholder]="updatedData.rut || 'RUT'">
     </ion-item>
-    <ion-item>
-      <ion-label position="floating">Tipo</ion-label>
-      <ion-select [(ngModel)]="updatedData.tipo" name="tipo" required>
-        <ion-select-option value="admin">Administrador</ion-select-option>
-        <ion-select-option value="usuario">Usuario</ion-select-option>
-        <ion-select-option value="conductor">Conductor</ion-select-option>
-      </ion-select>
+    <ion-item lines="none">
+      <input class="editInput" [(ngModel)]="updatedData.telefono" name="telefono"
+             [placeholder]="updatedData.telefono || 'Numero telefonico'">
     </ion-item>
-    <ion-item>
-      <ion-label>Deshabilitado</ion-label>
-      <ion-toggle [(ngModel)]="updatedData.disabled" name="disabled"></ion-toggle>
+    <ion-item lines="none">
+      <input class="editInput" type="number" [(ngModel)]="updatedData.edad" name="edad"
+             [placeholder]="updatedData.edad || 'Edad'">
     </ion-item>
-    <ion-button expand="block" color="dark" type="submit" style="margin: 0 10px;">Actualizar</ion-button>
+    <ion-item lines="none">
+      <input class="editInput" type="email" [(ngModel)]="updatedData.email" name="email" required
+             [placeholder]="updatedData.email || 'Correo electronico'">
+    </ion-item>
+    <ion-item lines="none">
+      <input class="editInput" type="password" [(ngModel)]="updatedData.pass" name="pass"
+             placeholder="Contraseña">
+    </ion-item>
+    <ion-item lines="none">
+      <select class="editInput" [(ngModel)]="updatedData.tipo" name="tipo" required>
+        <option [selected]="updatedData.tipo === 'admin'" value="admin">Administrador</option>
+        <option [selected]="updatedData.tipo === 'usuario'" value="usuario">Usuario</option>
+        <option [selected]="updatedData.tipo === 'conductor'" value="conductor">Conductor</option>
+      </select>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label style="color: white;">Deshabilitado</ion-label>
+      <ion-toggle [(ngModel)]="updatedData.disabled" name="disabled" color="light" slot="end"></ion-toggle>
+    </ion-item>
+    <ion-button expand="block" color="light" type="submit" style="margin: 20px 10px; margin-bottom: 0;">Actualizar</ion-button>
+    <ion-button expand="block" color="danger" style="margin: 5px 10px;" (click)="cerrarModal()">Cancelar</ion-button>
   </form>
 </ion-content>
