@@ -18,6 +18,10 @@
         <div class="input-container">
           <input formControlName="patente" type="text" placeholder="Patente (XX-YY-ZZ)" />
         </div>
+        <!-- New File Input for Image Upload -->
+        <div class="input-container">
+          <input type="file" (change)="onFileSelected($event)" placeholder="Sube una imagen del vehículo" />
+        </div>
 
         <ion-button size="block" (click)="regVeh()" color="dark">
           Registrar vehiculo

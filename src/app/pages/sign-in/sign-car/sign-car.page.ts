@@ -5,36 +5,35 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MenuController, ToastController } from '@ionic/angular';
 import { AuthServiceService } from 'src/app/services/auth-service.service';
 
+import { finalize } from 'rxjs/operators';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
+
 @Component({
   selector: 'app-sign-car',
   templateUrl: './sign-car.page.html',
   styleUrls: ['./sign-car.page.scss'],
 })
 export class SignCarPage implements OnInit {
-
-
-  /* ---- DEFINIR REGISTRO DE VEHICULO FORM ---- */
-
   registerCar: FormGroup;
-  
-  /* ---- RECIBIR UID ---- */
-  
   uid?: string;
+  imgVehiculoUrl: string = '';  // To store the vehicle image URL temporarily
 
   constructor(
     private router: Router,
-    private formBuilder: FormBuilder, 
+    private formBuilder: FormBuilder,
     private toastController: ToastController,
     private menuController: MenuController,
     private firestore: AngularFirestore,
-    private route: ActivatedRoute) {
-      this.registerCar = this.formBuilder.group({
-        marca : ['', [Validators.required]],
-        modelo : ['', [Validators.required]],
-        color : ['', [Validators.required]],
-        patente : ['', [Validators.required]],
-      });
-     }
+    private route: ActivatedRoute,
+    private storage: AngularFireStorage  // Inject AngularFireStorage
+  ) {
+    this.registerCar = this.formBuilder.group({
+      marca: ['', [Validators.required]],
+      modelo: ['', [Validators.required]],
+      color: ['', [Validators.required]],
+      patente: ['', [Validators.required]],
+    });
+  }
 
   ngOnInit() {
     const uid = this.route.snapshot.paramMap.get('uid'); // Obtener el UID
@@ -42,6 +41,25 @@ export class SignCarPage implements OnInit {
       this.uid = uid;
     }
     this.menuController.enable(false);
+  }
+
+  // Handle image file selection
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const filePath = `vehiculos/${this.uid}_${new Date().getTime()}`;
+      const fileRef = this.storage.ref(filePath);
+      const uploadTask = this.storage.upload(filePath, file);
+
+      // Monitor upload progress and get download URL
+      uploadTask.snapshotChanges().pipe(
+        finalize(() => {
+          fileRef.getDownloadURL().subscribe((url) => {
+            this.imgVehiculoUrl = url;  // Save the download URL
+          });
+        })
+      ).subscribe();
+    }
   }
 
   async regVeh() {
@@ -64,7 +82,8 @@ export class SignCarPage implements OnInit {
       marca,
       modelo,
       color,
-      patente
+      patente,
+      img_vehiculo: this.imgVehiculoUrl  // Include the image URL
     };
 
     try {

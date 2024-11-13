@@ -31,7 +31,7 @@
 
   </body>
 
-  <ion-modal #modal trigger="op-modal" [initialBreakpoint]="[0.3]" [breakpoints]="[0.3, 0.85]" class="iniciarViaje">
+  <ion-modal #modal trigger="op-modal" [initialBreakpoint]="[0.3]" [breakpoints]="[0.3, 0.85, 1]" class="iniciarViaje">
     <ng-template>
       <ion-content>
         <h1 style="text-align: center;">Selecciona un conductor</h1>
@@ -58,12 +58,31 @@
         <h1 style="text-align: center;">o Escanea un QR</h1>
         <p>Escanea el codigo generado por un conductor para unirte al viaje.</p>
   
-        <ion-button expand="block" color="light" (click)="startScan()" style="margin: 0 20px;">
+        <ion-button *ngIf="!isScanned" expand="block" color="light" (click)="startScan()" style="margin: 0 20px;">
           <ion-icon name="qr-code-outline" slot="start"></ion-icon>
           Escanear QR
         </ion-button>
+
+        <ion-card *ngIf="conductorInfo" class="tripCard">
+          <!-- Información del conductor -->
+          <ion-card-header>
+            <ion-card-title>{{ conductorInfo?.nombre }} {{ conductorInfo?.apellido }}</ion-card-title>
+          </ion-card-header>
+          
+          <ion-card-content>
+            <p><strong>Telefono:</strong> {{ conductorInfo?.telefono }}</p>
+            
+            <!-- Información del vehículo -->
+            <div *ngIf="vehiculoInfo">
+              <h3>Vehículo:</h3>
+              <p>{{ vehiculoInfo?.marca }} {{ vehiculoInfo?.modelo }}</p>
+              <p>Color: {{ vehiculoInfo?.color }}</p>
+              <img [src]="vehiculoInfo?.img_vehiculo" alt="Imagen del vehículo" style="width: 100%; height: auto;">
+            </div>
+          </ion-card-content>
+        </ion-card>              
+        
       </ion-content>
     </ng-template>
   </ion-modal>
-  
 </ion-content>

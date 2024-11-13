@@ -11,4 +11,6 @@ export interface Usuario {
     disabled?: boolean;
 
     activo?: boolean;
+
+    vehiculo?: any;
 }

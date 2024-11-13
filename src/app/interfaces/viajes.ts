@@ -2,8 +2,8 @@ export interface Viajes {
     codigo?: string;
     nom_destino?: string;
     nom_inicio?: string;
-    fecha?: string; 
-    coordenada?: string;
+    fecha?: Date; 
+    coordenada_inicio?: string;
     coordenada_destino?: string;
     costo_perperson?: string;
 
@@ -11,8 +11,5 @@ export interface Viajes {
     can_disponibles?: number;
 
     nom_conductor?: string;
-    color_veh?: string;
-    marca_veh?: string;
-
-    conductorId?: string;
+    conductorUid?: string;
 }

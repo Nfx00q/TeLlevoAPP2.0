@@ -78,3 +78,34 @@ body.barcode-scanner-active {
 .barcode-scanner-modal {
   visibility: visible;
 }
+
+.tripCard {
+  --background: rgb(24,24,24);
+
+  ion-card-title {
+    color: white;
+    text-align: center;
+  }
+
+  ion-card-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    text-align: left;
+  }
+
+  ion-card-content {
+    text-align: left;
+  }
+
+  div {
+    h3 {
+      color: white;
+      text-align: center;
+    }
+    
+    p {
+      color: white;
+      text-align: center;
+      font-size: 15px;
+    }
+  }
+}

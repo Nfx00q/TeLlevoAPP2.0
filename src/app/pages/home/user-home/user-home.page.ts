@@ -7,6 +7,7 @@ import { MenuController, ModalController, Platform } from '@ionic/angular';
 import { Viajes } from 'src/app/interfaces/viajes';
 import { BarcodeScanningModalComponent } from './barcode-scanning-modal.component';
 import { AuthServiceService } from 'src/app/services/auth-service.service';
+import Swal from 'sweetalert2';
 
 declare var google: any;
 
@@ -26,6 +27,12 @@ export class UserHomePage implements OnInit {
 
   public codigoEscaneado: string = '';
   viajeInfo: any;
+  conductorInfo: any;
+  vehiculoInfo: any;
+
+  /* ---- SCANNER ---- */
+
+  isScanned: boolean = false;
 
   map: any;
   directionsService: any;
@@ -50,10 +57,6 @@ export class UserHomePage implements OnInit {
     this.getUsers();
     this.menuController.enable(false);
 
-    this.loadGoogleMaps().then(() => {
-      this.initMap();
-    });
-
     if (this.platform.is('capacitor')){
       BarcodeScanner.isSupported().then()
       BarcodeScanner.checkPermissions().then()
@@ -61,7 +64,11 @@ export class UserHomePage implements OnInit {
     }
   }
 
-  ngAfterViewInit() { }
+  ngAfterViewInit() { 
+    this.loadGoogleMaps().then(() => {
+      this.initMap();
+    });
+   }
 
   getUsers() {
     this.authService.getUsers().subscribe(users => {
@@ -156,32 +163,69 @@ export class UserHomePage implements OnInit {
 
   /* ---- Scan QR Code ----- */
 
-  async startScan(){
-    const modal = await this.modalController.create({
-      component: BarcodeScanningModalComponent,
-      cssClass: 'barcode-scanner-modal',
-      showBackdrop: false,
-      componentProps: {
-        formats: [],
-        LensFacing: LensFacing.Back
-      },
-      presentingElement: await this.modalController.getTop()
-    });
+  async startScan() {
+    // Simulación del valor del código QR (predefinido)
+    const simulatedBarcode = "Etha1uGVbeSV3Sfj6e7z"; // Este es el valor predefinido del código QR
+    console.log(`Código escaneado (simulado): ${simulatedBarcode}`);
     
-
-    await modal.present();
-
-    // RESULTADO DE SCANEO
-
-    const {data} = await modal.onDidDismiss();
-
-    // SI SE OBTIENE INFO EN DATA
-
-    if (data?.barcode?.displayValue){
-      this.codigoEscaneado = data.barcode.displayValue;
-      console.log(this.codigoEscaneado);
-    }
+    // Aquí no es necesario abrir el modal ni usar el escáner, ya que estamos simulando
+    this.codigoEscaneado = simulatedBarcode;
+  
+    // Buscar el viaje en Firebase con el código simulado
+    this.firestore.collection('viajes').doc(this.codigoEscaneado).get().subscribe((doc) => {
+      if (doc.exists) {
+        this.viajeInfo = doc.data() as Viajes;
+        console.log("Viaje encontrado:", this.viajeInfo);
+  
+        // Verificar disponibilidad
+        if (this.viajeInfo.can_disponibles > 0) {
+          // Obtener la información del conductor usando conductorUid
+          const conductorUid = this.viajeInfo.conductorUid;
+          console.log("Conductor UID:", conductorUid);
+  
+          // Obtener la información del conductor desde la colección "usuarios"
+          this.firestore.collection('usuarios').doc(conductorUid).get().subscribe((conductorDoc) => {
+            if (conductorDoc.exists) {
+              this.conductorInfo = conductorDoc.data();
+              console.log('Información del conductor:', this.conductorInfo);
+  
+              // Obtener la información del vehículo
+              const vehiculo = this.conductorInfo?.vehiculo;
+              if (vehiculo) {
+                console.log('Información del vehículo:', vehiculo);
+                const { marca, modelo, color, img_vehiculo } = vehiculo;
+                this.vehiculoInfo = { marca, modelo, color, img_vehiculo };
+                console.log('Marca:', marca);
+                console.log('Modelo:', modelo);
+                console.log('Color:', color);
+                console.log('Imagen del vehículo:', img_vehiculo);
+              } else {
+                console.log("El conductor no tiene un vehículo registrado.");
+              }
+  
+              // Reducir la cantidad de asientos disponibles en 1
+              this.firestore.collection('viajes').doc(this.codigoEscaneado).update({
+                can_disponibles: this.viajeInfo.can_disponibles - 1
+              }).then(() => {
+                console.log("Información cargada correctamente");
+                this.isScanned = true;
+              }).catch((error) => {
+                console.error("Error al actualizar can_disponibles:", error);
+              });
+            } else {
+              console.log("Conductor no encontrado.");
+            }
+          });
+        } else {
+          console.log("No hay asientos disponibles.");
+        }
+      } else {
+        console.log("Viaje no encontrado.");
+      }
+    });
   }
+  
+  
 
   joinTrip(){
     
