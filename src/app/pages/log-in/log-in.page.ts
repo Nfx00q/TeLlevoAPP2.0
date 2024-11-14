@@ -7,7 +7,7 @@ import { LoadingController, MenuController } from '@ionic/angular';
 import { Usuario } from 'src/app/interfaces/usuario';
 import { AuthServiceService } from 'src/app/services/auth-service.service';
 
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2/dist/sweetalert2.all.js';
 
 @Component({
   selector: 'app-log-in',
@@ -19,10 +19,6 @@ export class LogInPage implements OnInit {
   /* ----- DEFINIR LOGIN ----- */
   loginForm: FormGroup;
   resetForm: FormGroup;
-
-  /* ----- DEFINIR VALORES DE INPUT ----- */
-  emailValue: string = '';
-  passValue: string = '';
 
   constructor(
     private router: Router,
@@ -57,8 +53,8 @@ export class LogInPage implements OnInit {
     try {
         await loading.present();
 
-        const email = this.emailValue;
-        const pass = this.passValue;
+        const email = this.loginForm.get('email')?.value;
+        const pass = this.loginForm.get('pass')?.value;
 
         // Intentar iniciar sesión
         const aux = await this.authService.login(email, pass);
@@ -105,8 +101,7 @@ export class LogInPage implements OnInit {
             confirmButtonText: 'OK',
             heightAuto: false,
         });
-        this.emailValue = '';
-        this.passValue = '';
+        this.loginForm.reset(); // Limpiar los campos del formulario
     } finally {
         loading.dismiss();
     }

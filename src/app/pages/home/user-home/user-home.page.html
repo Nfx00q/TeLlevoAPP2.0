@@ -6,7 +6,9 @@
     <!-- Google MAP Script -->
 
     <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp4tplN5KEmKIHOV4vyFXuS6KKFsJqESg&callback=googleMapsCallback&v=beta&t=${new Date().getTime()}">
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp4tplN5KEmKIHOV4vyFXuS6KKFsJqESg&libraries=places"
+      async 
+      defer>
     </script>
 
   </head>
@@ -14,6 +16,10 @@
   <body>
 
     <div id="map" class="map"></div>
+
+    <div id="welcome">
+      <label>Bienvenido: {{ nombreUsuario }}</label>
+    </div>
 
     <ion-fab slot="fixed" vertical="bottom" horizontal="end">
       <ion-fab-button color="dark">

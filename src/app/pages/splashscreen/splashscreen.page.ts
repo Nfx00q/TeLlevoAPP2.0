@@ -7,6 +7,8 @@ import { Usuario } from 'src/app/interfaces/usuario';
 
 import { NativeBiometric } from 'capacitor-native-biometric';
 
+import { firstValueFrom } from 'rxjs';
+
 @Component({
   selector: 'app-splashscreen',
   templateUrl: './splashscreen.page.html',
@@ -35,8 +37,8 @@ export class SplashscreenPage implements OnInit {
           await this.checkHuellaDigital();
   
           // Obtener datos del usuario desde Firestore
-          const usuarioDoc = await this.firestore.collection('usuarios').doc(user.uid).get().toPromise();
-          const userData = usuarioDoc?.data() as Usuario;
+          const usuarioDoc = await firstValueFrom(this.firestore.collection('usuarios').doc(user.uid).get());
+          const userData = usuarioDoc?.data() as Usuario | undefined;
   
           if (userData) {
             if (userData.tipo === 'admin') {

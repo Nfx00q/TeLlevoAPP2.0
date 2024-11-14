@@ -43,20 +43,18 @@ export class DriverPage implements OnInit, AfterViewInit {
   usuarioLogin?: string;
   usuario: any;
 
-  /* -------- RENDER -------- */
+  /* -------- DATOS USER -------- */
+
+  nombreUsuario?: string;
 
   private renderers: any[] = [];
-
-  public nombreUsuario?: string = '';
-  public apellidoUsuario?: string;
-  public img_usuario?: string;
   
   ubicaciones = [
-    { lat: -33.598425578019224, lng: -70.57833859675443, icon: 'assets/icon/instituto.png', label: 'Cede Puente Alto', value: 'puente_alto' },
-    { lat: -33.66860553928277, lng: -70.58535175998844, icon: 'assets/icon/instituto.png', label: 'Cede Pirque', value: 'pirque' },
-    { lat: -33.5800609330941, lng: -70.58197464104566, icon: 'assets/icon/stop.png', label: 'TL-1 / Av. Gabriela & Av. Concha y Toro', value: 'tl1' },
-    { lat: -33.57426112502435, lng: -70.55495967884225, icon: 'assets/icon/stop.png', label: 'TL-2 / Av. Gabriela Ote. & Av. Camilo Henriquez', value: 'tl2' },
-    { lat: -33.56692284768454, lng: -70.63052933119687, icon: 'assets/icon/stop.png', label: 'TL-3 / Av. Observatorio & Av. Sta. Rosa', value: 'tl3' },
+    { lat: -33.598425578019224, lng: -70.57833859675443, icon: 'assets/icon/instituto.png', label: 'Cede Puente Alto', value: 'puente_alto', title: 'Duoc UC' },
+    { lat: -33.66860553928277, lng: -70.58535175998844, icon: 'assets/icon/instituto.png', label: 'Cede Pirque', value: 'pirque', title: 'Duoc UC' },
+    { lat: -33.5800609330941, lng: -70.58197464104566, icon: 'assets/icon/stop.png', label: 'TL-1 / Av. Gabriela & Av. Concha y Toro', value: 'tl1', title: 'TL-1' },
+    { lat: -33.57426112502435, lng: -70.55495967884225, icon: 'assets/icon/stop.png', label: 'TL-2 / Av. Gabriela Ote. & Av. Camilo Henriquez', value: 'tl2', title: 'TL-2' },
+    { lat: -33.56692284768454, lng: -70.63052933119687, icon: 'assets/icon/stop.png', label: 'TL-3 / Av. Observatorio & Av. Sta. Rosa', value: 'tl3', title: 'TL-3' },
   ];
 
   qrViaje: string = '';
@@ -74,6 +72,7 @@ export class DriverPage implements OnInit, AfterViewInit {
         // Obtener los datos del usuario desde Firestore
         this.authService.getUserData(user.uid).subscribe(userData => {
           this.usuario = userData;
+          this.nombreUsuario = userData?.nombre
         });
       } else {
         console.error("No se encontró un usuario autenticado.");
@@ -137,7 +136,7 @@ export class DriverPage implements OnInit, AfterViewInit {
                 url: `${ubicacion.icon}?t=${new Date().getTime()}`, // Evita la cache del icono
                 scaledSize: new google.maps.Size(40, 40),
             },
-            title: ubicacion.label,
+            title: ubicacion.title,
         });
 
         const infoWindow = new google.maps.InfoWindow({
@@ -186,19 +185,19 @@ export class DriverPage implements OnInit, AfterViewInit {
                     this.renderers.forEach(renderer => renderer.setMap(null));
                     this.renderers = [];
 
-                    // Configurar renderers de rutas
-                    const createRenderer = (color: string) => new google.maps.DirectionsRenderer({
+                    // Configurar renderers de rutas con opciones personalizadas
+                    const createRenderer = (color: string, weight: number, opacity: number) => new google.maps.DirectionsRenderer({
                         suppressMarkers: true,
                         polylineOptions: {
-                            strokeColor: color,
-                            strokeWeight: 6,
-                            strokeOpacity: 0.7,
-                            geodesic: true
+                            strokeColor: color,  // Color de la línea
+                            strokeWeight: weight,  // Grosor de la línea
+                            strokeOpacity: opacity,  // Opacidad de la línea
+                            geodesic: true  // Línea geodésica
                         }
                     });
                     
-                    const walkingRenderer = createRenderer('#242424');
-                    const drivingRenderer = createRenderer('#000000');
+                    const walkingRenderer = createRenderer('#6C6C6C', 5, 0.7); // Ruta caminando con color gris oscuro, grosor 5 y opacidad 0.7
+                    const drivingRenderer = createRenderer('#373737', 6, 0.8); // Ruta en coche con color azul, grosor 6 y opacidad 0.8
                     
                     walkingRenderer.setMap(this.map);
                     drivingRenderer.setMap(this.map);
@@ -206,14 +205,15 @@ export class DriverPage implements OnInit, AfterViewInit {
 
                     // Solicitudes de rutas
                     const requestWalking: google.maps.DirectionsRequest = {
-                        origin: pos,
-                        destination: { lat: inicio.lat, lng: inicio.lng },
-                        travelMode: google.maps.TravelMode.WALKING
+                        origin: pos,  // Ubicación actual del usuario
+                        destination: { lat: inicio.lat, lng: inicio.lng },  // Marcador de inicio
+                        travelMode: google.maps.TravelMode.WALKING  // Ruta a pie
                     };
+
                     const requestDriving: google.maps.DirectionsRequest = {
-                        origin: { lat: inicio.lat, lng: inicio.lng },
-                        destination: { lat: destino.lat, lng: destino.lng },
-                        travelMode: google.maps.TravelMode.DRIVING
+                        origin: { lat: inicio.lat, lng: inicio.lng },  // Marcador de inicio
+                        destination: { lat: destino.lat, lng: destino.lng },  // Marcador de destino
+                        travelMode: google.maps.TravelMode.DRIVING  // Ruta en coche
                     };
 
                     // Función para procesar y mostrar la duración
@@ -272,7 +272,6 @@ export class DriverPage implements OnInit, AfterViewInit {
         }
     }
   }
-
 
   /* ---- COSTO VIAJE ------ */
 

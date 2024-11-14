@@ -5,8 +5,10 @@
 
     <!-- Google MAP Script -->
 
-    <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp4tplN5KEmKIHOV4vyFXuS6KKFsJqESg&libraries=places">
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp4tplN5KEmKIHOV4vyFXuS6KKFsJqESg&libraries=places"
+      async 
+      defer>
     </script>
 
   </head>
@@ -15,6 +17,15 @@
 
     <div id="map" class="map"></div>
     <div id="duration"></div>
+    <div id="simbology">
+      <h5 style="text-align: center;">Simbologia</h5>
+      <label><ion-icon name="radio-button-on-outline" slot="start" style="color: #6C6C6C;"></ion-icon> Ruta a pie</label><br>
+      <label><ion-icon name="radio-button-on-outline" slot="start" style="color: #373737"></ion-icon> Ruta a vehiculo</label>
+    </div>
+
+    <div id="welcome">
+      <label>Bienvenido: {{ nombreUsuario }}</label>
+    </div>
 
     <ion-fab slot="fixed" vertical="bottom" horizontal="start">
       <ion-fab-button color="dark">
@@ -32,7 +43,7 @@
 
   </body>
 
-  <ion-modal #modal trigger="op-modal" [initialBreakpoint]="0.6" [breakpoints]="[0.85]" class="iniciarViaje">
+  <ion-modal #modal trigger="op-modal" [initialBreakpoint]="0.6" [breakpoints]="[0.6, 0.85]" class="iniciarViaje">
     <ng-template>
       <ion-content>
         <h1 style="text-align: center;">Iniciar viaje</h1>
@@ -55,7 +66,7 @@
         </ion-item>
 
         <ion-item lines="none">
-          <ion-label position="stacked">Costo del viaje</ion-label>
+          <ion-label position="stacked">Costo del viaje (Por persona)</ion-label>
           <ion-input [(ngModel)]="costoViaje" placeholder="0" (ionInput)="formatCurrency($event)" (keypress)="preventNonNumeric($event)" required></ion-input>
         </ion-item>
         

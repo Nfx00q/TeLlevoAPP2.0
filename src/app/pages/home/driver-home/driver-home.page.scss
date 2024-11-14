@@ -50,3 +50,38 @@
       text-align: center;
     }
   }
+
+#simbology {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  top: 30px;
+
+  background-color: rgba(255, 255, 255, 0.9);
+  color: rgb(0, 0, 0);
+
+  border-radius: 5px;
+  padding: 5px;
+
+  label {
+    font-size: 12px;
+  }
+
+  h5 {
+    font-size: 15px;
+    margin: 0;
+  }
+}
+
+#welcome {
+  position: absolute;
+  z-index: 2;
+  right: 15px;
+  bottom: 20px;
+
+  background-color: rgba(0, 0, 0, 0.9);
+  color: rgb(255, 255, 255);
+
+  border-radius: 5px;
+  padding: 5px;
+}
