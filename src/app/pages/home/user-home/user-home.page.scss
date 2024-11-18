@@ -84,29 +84,17 @@ body.barcode-scanner-active {
 
   ion-card-title {
     color: white;
+    margin-bottom: 10px;
     text-align: center;
   }
 
-  ion-card-subtitle {
-    color: rgba(255, 255, 255, 0.8);
+  ion-card-header p, ion-card-content p {
+    margin: 0;
     text-align: left;
   }
 
-  ion-card-content {
-    text-align: left;
-  }
-
-  div {
-    h3 {
-      color: white;
-      text-align: center;
-    }
-    
-    p {
-      color: white;
-      text-align: center;
-      font-size: 15px;
-    }
+  ion-card-content div img {
+    padding: 20px;
   }
 }
 

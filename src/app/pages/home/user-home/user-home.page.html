@@ -37,7 +37,7 @@
 
   </body>
 
-  <ion-modal #modal trigger="op-modal" [initialBreakpoint]="[0.3]" [breakpoints]="[0.3, 0.85, 1]" class="iniciarViaje">
+  <ion-modal #modal trigger="op-modal" [initialBreakpoint]="[0.43]" [breakpoints]="[0.43, 1]" class="iniciarViaje">
     <ng-template>
       <ion-content>
         <h1 style="text-align: center;">Selecciona un conductor</h1>
@@ -59,10 +59,12 @@
               </ion-item>
             </ng-container>
           </div>
-        </ion-list>                
-  
-        <h1 style="text-align: center;">o Escanea un QR</h1>
-        <p>Escanea el codigo generado por un conductor para unirte al viaje.</p>
+        </ion-list>
+        
+        <div *ngIf="!isScanned">
+          <h1 style="text-align: center;">o Escanea un QR</h1>
+          <p>Escanea el codigo generado por un conductor para unirte al viaje.</p>
+        </div>
   
         <ion-button *ngIf="!isScanned" expand="block" color="light" (click)="startScan()" style="margin: 0 20px;">
           <ion-icon name="qr-code-outline" slot="start"></ion-icon>
@@ -72,22 +74,35 @@
         <ion-card *ngIf="conductorInfo" class="tripCard">
           <!-- Información del conductor -->
           <ion-card-header>
-            <ion-card-title>{{ conductorInfo?.nombre }} {{ conductorInfo?.apellido }}</ion-card-title>
+            <ion-card-title>Tu conductor</ion-card-title>
+            <p><strong>Nombre:</strong> {{ conductorInfo?.nombre }} {{ conductorInfo?.apellido }}</p>
+            <p><strong>Telefono:</strong> {{ conductorInfo?.telefono }}</p>
+            <p><strong>RUT:</strong> {{ conductorInfo?.rut }}</p>
           </ion-card-header>
           
           <ion-card-content>
-            <p><strong>Telefono:</strong> {{ conductorInfo?.telefono }}</p>
+            <ion-card-title style="margin: 0;">Su vehiculo</ion-card-title>
             
             <!-- Información del vehículo -->
             <div *ngIf="vehiculoInfo">
-              <h3>Vehículo:</h3>
-              <p>{{ vehiculoInfo?.marca }} {{ vehiculoInfo?.modelo }}</p>
-              <p>Color: {{ vehiculoInfo?.color }}</p>
+              <p>{{ vehiculoInfo?.marca }} {{ vehiculoInfo?.modelo }} <strong>{{ vehiculoInfo?.color }}</strong></p>
+              <p><strong>Patente: </strong> {{ vehiculoInfo?.patente }}</p>
               <img [src]="vehiculoInfo?.img_vehiculo" alt="Imagen del vehículo" style="width: 100%; height: auto;">
             </div>
+
+            <ion-card-title style="margin: 0;">Su vehiculo</ion-card-title>
+            
+            <!-- Información del vehículo -->
+            <div *ngIf="viajeInfo">
+              <p style="color: rgba(255,255,255,0.5); font-size: 12px; text-align: center;">Codigo de viaje: {{ viajeInfo?.codigo }}</p>
+              <p style="color: rgba(255,255,255,0.3); font-size: 10px; text-align: center; padding: 0;">Fecha de creación: {{ viajeInfo?.fecha?.toDate() | date: 'short' }}</p>
+              <p><strong>Inicio:</strong> {{ viajeInfo?.nom_inicio}}</p>
+              <p><strong>Destino:</strong> {{ viajeInfo?.nom_destino}}</p>
+              <p><strong>Costo (por persona)</strong></p>
+              <p style="font-size: 30px; color: white;">{{ viajeInfo?.costo_perperson }}</p>
+            </div>
           </ion-card-content>
-        </ion-card>              
-        
+        </ion-card>             
       </ion-content>
     </ng-template>
   </ion-modal>

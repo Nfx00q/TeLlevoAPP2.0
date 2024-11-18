@@ -354,26 +354,19 @@ export class UserHomePage implements OnInit {
                         .subscribe((conductorDoc) => {
                             if (conductorDoc.exists) {
                                 this.conductorInfo = conductorDoc.data();
-                                console.log(
-                                    "Información del conductor:",
-                                    this.conductorInfo
-                                );
 
                                 // Obtener la información del vehículo
                                 const vehiculo = this.conductorInfo?.vehiculo;
                                 if (vehiculo) {
                                     console.log("Información del vehículo:", vehiculo);
-                                    const { marca, modelo, color, img_vehiculo } = vehiculo;
+                                    const { marca, modelo, color, img_vehiculo, patente } = vehiculo;
                                     this.vehiculoInfo = {
                                         marca,
                                         modelo,
                                         color,
                                         img_vehiculo,
+                                        patente
                                     };
-                                    console.log("Marca:", marca);
-                                    console.log("Modelo:", modelo);
-                                    console.log("Color:", color);
-                                    console.log("Imagen del vehículo:", img_vehiculo);
                                 } else {
                                     console.log("El conductor no tiene un vehículo registrado.");
                                 }
