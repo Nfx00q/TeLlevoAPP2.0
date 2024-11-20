@@ -12,4 +12,5 @@ export interface Viajes {
 
     nom_conductor?: string;
     conductorUid?: string;
+    activo?: boolean;
 }

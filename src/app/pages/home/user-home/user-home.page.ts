@@ -3,15 +3,12 @@ import { AngularFirestore } from "@angular/fire/compat/firestore";
 import { Router } from "@angular/router";
 import {
   BarcodeScanner,
-  LensFacing,
-  ScanResult,
 } from "@capacitor-mlkit/barcode-scanning";
 import { Geolocation } from "@capacitor/geolocation";
-import { MenuController, ModalController, Platform } from "@ionic/angular";
+import { MenuController, Platform } from "@ionic/angular";
 import { Viajes } from "src/app/interfaces/viajes";
-import { BarcodeScanningModalComponent } from "./barcode-scanning-modal.component";
 import { AuthServiceService } from "src/app/services/auth-service.service";
-import Swal from "sweetalert2";
+import { ViajesService } from "src/app/services/viejes.service";
 
 declare var google: any;
 
@@ -21,7 +18,6 @@ declare var google: any;
   styleUrls: ["./user-home.page.scss"],
 })
 export class UserHomePage implements OnInit {
-  
   /* ----- Obtener USUARIOS (Conductores disponibles) ------ */
 
   usuarios: any[] = [];
@@ -38,6 +34,12 @@ export class UserHomePage implements OnInit {
   map: any;
   directionsService: any;
   directionsRenderer: any;
+
+  /* ------- VIAJES ----------- */
+
+  viajes?: any [] = [];
+
+  private renderers: google.maps.DirectionsRenderer[] = [];
 
   /* ----- SCANNER ------ */
 
@@ -60,7 +62,7 @@ export class UserHomePage implements OnInit {
     },
     {
       lat: -33.5800609330941,
-      lng: -70.58197464104566 ,
+      lng: -70.58197464104566,
       icon: "assets/icon/stop.png",
       label: "TL-1 / Av. Gabriela & Av. Concha y Toro",
       title: "TL-1",
@@ -84,14 +86,15 @@ export class UserHomePage implements OnInit {
   constructor(
     private router: Router,
     private firestore: AngularFirestore,
-    private modalController: ModalController,
     private platform: Platform,
     private menuController: MenuController,
-    private authService: AuthServiceService
+    private authService: AuthServiceService,
+    private viajeService: ViajesService
   ) {}
 
   ngOnInit() {
     this.getUsers();
+    this.getViajes();
     this.menuController.enable(false);
 
     if (this.platform.is("capacitor")) {
@@ -106,12 +109,12 @@ export class UserHomePage implements OnInit {
       this.initMap();
     });
 
-    this.authService.getCurrentUser().subscribe(user => {
+    this.authService.getCurrentUser().subscribe((user) => {
       if (user && user.uid) {
         // Obtener los datos del usuario desde Firestore
-        this.authService.getUserData(user.uid).subscribe(userData => {
+        this.authService.getUserData(user.uid).subscribe((userData) => {
           this.usuario = userData;
-          this.nombreUsuario = userData?.nombre
+          this.nombreUsuario = userData?.nombre;
         });
       } else {
         console.error("No se encontró un usuario autenticado.");
@@ -123,6 +126,12 @@ export class UserHomePage implements OnInit {
     this.authService.getUsers().subscribe((users) => {
       this.usuarios = users;
     });
+  }
+
+  getViajes(){
+    this.viajeService.getViajes().subscribe((viajes) => {
+      this.viajes = viajes;
+    })
   }
 
   /* ----- INICIALIZAR MAPA ----- */
@@ -324,80 +333,193 @@ export class UserHomePage implements OnInit {
   */
 
   async startScan() {
-    // Simula un código QR escaneado
-    const codigoSimulado = "nMq4tTHhsdaMlYNVPcfq";  // Reemplaza con un código de prueba que exista en tu base de datos
-
-    // Asigna el código simulado
+    const codigoSimulado = "3kCrdwbCsOCs48EjSa0h"; // Replace with an actual test code from your database
     this.codigoEscaneado = codigoSimulado;
-    console.log(`Código escaneado simulado: ${this.codigoEscaneado}`);
+    console.log(`Simulated scanned code: ${this.codigoEscaneado}`);
 
-    // Buscar el viaje en Firebase usando el código simulado
+    // Fetch the trip from Firebase using the "codigo" field
     this.firestore
-        .collection("viajes")
-        .doc(this.codigoEscaneado)
-        .get()
-        .subscribe((doc) => {
-            if (doc.exists) {
-                this.viajeInfo = doc.data() as Viajes;
-                console.log("Viaje encontrado:", this.viajeInfo);
+      .collection("viajes", (ref) =>
+        ref.where("codigo", "==", this.codigoEscaneado)
+      )
+      .get()
+      .subscribe((querySnapshot) => {
+        if (!querySnapshot.empty) {
+          // Assuming there's only one trip with this code
+          const doc = querySnapshot.docs[0];
+          this.viajeInfo = doc.data() as Viajes;
+          console.log("Trip found:", this.viajeInfo);
 
-                // Verificar disponibilidad
-                if (this.viajeInfo.can_disponibles > 0) {
-                    // Obtener la información del conductor usando conductorUid
-                    const conductorUid = this.viajeInfo.conductorUid;
-                    console.log("Conductor UID:", conductorUid);
+          if (this.viajeInfo.can_disponibles > 0) {
+            const conductorUid = this.viajeInfo.conductorUid;
+            console.log("Driver UID:", conductorUid);
 
-                    this.firestore
-                        .collection("usuarios")
-                        .doc(conductorUid)
-                        .get()
-                        .subscribe((conductorDoc) => {
-                            if (conductorDoc.exists) {
-                                this.conductorInfo = conductorDoc.data();
+            this.firestore
+              .collection("usuarios")
+              .doc(conductorUid)
+              .get()
+              .subscribe((conductorDoc) => {
+                if (conductorDoc.exists) {
+                  this.conductorInfo = conductorDoc.data();
 
-                                // Obtener la información del vehículo
-                                const vehiculo = this.conductorInfo?.vehiculo;
-                                if (vehiculo) {
-                                    console.log("Información del vehículo:", vehiculo);
-                                    const { marca, modelo, color, img_vehiculo, patente } = vehiculo;
-                                    this.vehiculoInfo = {
-                                        marca,
-                                        modelo,
-                                        color,
-                                        img_vehiculo,
-                                        patente
-                                    };
-                                } else {
-                                    console.log("El conductor no tiene un vehículo registrado.");
-                                }
+                  const vehiculo = this.conductorInfo?.vehiculo;
+                  if (vehiculo) {
+                    console.log("Vehicle information:", vehiculo);
+                    const { marca, modelo, color, img_vehiculo, patente } =
+                      vehiculo;
+                    this.vehiculoInfo = {
+                      marca,
+                      modelo,
+                      color,
+                      img_vehiculo,
+                      patente,
+                    };
+                  } else {
+                    console.log(
+                      "The driver does not have a registered vehicle."
+                    );
+                  }
 
-                                // Reducir la cantidad de asientos disponibles en 1
-                                this.firestore
-                                    .collection("viajes")
-                                    .doc(this.codigoEscaneado)
-                                    .update({
-                                        can_disponibles: this.viajeInfo.can_disponibles - 1,
-                                    })
-                                    .then(() => {
-                                        console.log("Información cargada correctamente");
-                                        this.isScanned = true;
-                                    })
-                                    .catch((error) => {
-                                        console.error("Error al actualizar can_disponibles:", error);
-                                    });
-                            } else {
-                                console.log("Conductor no encontrado.");
-                            }
-                        });
+                  // Reduce the available seats by 1 and add the passenger UID to the trip
+                  const updatedPasajeros = this.viajeInfo.pasajeros || [];
+                  updatedPasajeros.push(this.usuario.uid);  // Add the scanned user's UID
+                  
+                  this.firestore
+                    .collection("viajes")
+                    .doc(doc.id) // Use the document ID for the update
+                    .update({
+                      can_disponibles: this.viajeInfo.can_disponibles - 1,
+                      pasajeros: updatedPasajeros,  // Store the list of passenger UIDs
+                      activo: true // Set the trip status as active
+                    })
+                    .then(() => {
+                      console.log("Information loaded successfully");
+                      this.isScanned = true;
+
+                      // Parse coordinates and generate routes on the map
+                      const inicio = JSON.parse(
+                        this.viajeInfo.coordenada_inicio || "{}"
+                      );
+                      const destino = JSON.parse(
+                        this.viajeInfo.coordenada_destino || "{}"
+                      );
+
+                      if (inicio && destino) {
+                        this.generateRoute(inicio, destino);
+                      } else {
+                        console.log(
+                          "Starting or destination coordinates missing."
+                        );
+                      }
+                    })
+                    .catch((error) => {
+                      console.error("Error updating available seats:", error);
+                    });
                 } else {
-                    console.log("No hay asientos disponibles.");
+                  console.log("Driver not found.");
                 }
-            } else {
-                console.log("Viaje no encontrado.");
-            }
-        });
+              });
+          } else {
+            console.log("No seats available.");
+          }
+        } else {
+          console.log("Trip not found.");
+        }
+      });
   }
 
 
-  joinTrip() {}
+  // Helper function to generate the route on the map
+  generateRoute(
+    inicio: { lat: number; lng: number },
+    destino: { lat: number; lng: number }
+  ) {
+    // Clear any previous routes
+    this.renderers.forEach((renderer) => renderer.setMap(null));
+    this.renderers = [];
+
+    // Create route renderers
+    const createRenderer = (color: string, weight: number, opacity: number) =>
+      new google.maps.DirectionsRenderer({
+        suppressMarkers: true,
+        polylineOptions: {
+          strokeColor: color,
+          strokeWeight: weight,
+          strokeOpacity: opacity,
+          geodesic: true,
+        },
+      });
+
+    const walkingRenderer = createRenderer("#6C6C6C", 5, 0.7);
+    const drivingRenderer = createRenderer("#373737", 6, 0.8);
+
+    walkingRenderer.setMap(this.map);
+    drivingRenderer.setMap(this.map);
+    this.renderers.push(walkingRenderer, drivingRenderer);
+
+    // Get current location and calculate the walking route to the start point
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const currentPos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        const requestWalking: google.maps.DirectionsRequest = {
+          origin: currentPos,
+          destination: inicio,
+          travelMode: google.maps.TravelMode.WALKING,
+        };
+
+        this.directionsService.route(
+          requestWalking,
+          (
+            result: google.maps.DirectionsResult,
+            status: google.maps.DirectionsStatus
+          ) => {
+            if (status === google.maps.DirectionsStatus.OK) {
+              walkingRenderer.setDirections(result);
+            } else {
+              console.error("Walking route error:", status);
+            }
+          }
+        );
+
+        // Calculate the driving route from the start to the destination
+        const requestDriving: google.maps.DirectionsRequest = {
+          origin: inicio,
+          destination: destino,
+          travelMode: google.maps.TravelMode.DRIVING,
+        };
+
+        // Función para procesar y mostrar la duración
+        const displayDuration = (
+          result: google.maps.DirectionsResult,
+          renderer: google.maps.DirectionsRenderer
+        ) => {
+          renderer.setDirections(result);
+          const durationText =
+            result.routes[0].legs[0].duration?.text ?? "Desconocido";
+          const durationElement = document.getElementById("duration");
+          if (durationElement) durationElement.innerText = durationText;
+          console.log(`Tiempo estimado: ${durationText}`);
+        };
+
+        this.directionsService.route(
+          requestDriving,
+          (
+            result: google.maps.DirectionsResult,
+            status: google.maps.DirectionsStatus
+          ) => {
+            if (status === google.maps.DirectionsStatus.OK) {
+              drivingRenderer.setDirections(result);
+              displayDuration(result, walkingRenderer);
+            } else {
+              console.error("Driving route error:", status);
+            }
+          }
+        );
+      },
+      () => console.error("Error retrieving current location.")
+    );
+  }
 }

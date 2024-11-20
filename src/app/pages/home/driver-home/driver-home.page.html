@@ -17,15 +17,16 @@
 
     <div id="map" class="map"></div>
     <div id="duration"></div>
-    <div id="simbology">
-      <h5 style="text-align: center;">Simbologia</h5>
-      <label><ion-icon name="radio-button-on-outline" slot="start" style="color: #6C6C6C;"></ion-icon> Ruta a pie</label><br>
-      <label><ion-icon name="radio-button-on-outline" slot="start" style="color: #373737"></ion-icon> Ruta a vehiculo</label>
-    </div>
 
     <div id="welcome">
       <label>Bienvenido: {{ nombreUsuario }}</label>
     </div>
+
+    <ion-fab slot="fixed" vertical="top" horizontal="end">
+      <ion-fab-button color="dark" *ngIf="viajeActivo" (click)="abrirModalViaje()">
+        <ion-icon name="car-sport-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
 
     <ion-fab slot="fixed" vertical="bottom" horizontal="start">
       <ion-fab-button color="dark">
@@ -92,5 +93,42 @@
       </ion-content>
     </ng-template>
   </ion-modal>
+
+  <ion-modal #modalViajeActivo [isOpen]="false" [initialBreakpoint]="0.6" [breakpoints]="[0.6, 0.85]" class="infoViaje">
+    <ng-template>
+      <ion-content>
+        <h1 style="text-align: center;">Información del Viaje</h1>
+        <ion-list>
+          <ion-item>
+            <ion-label>Inicio:</ion-label>
+            <ion-text>{{ viajeActivo?.nom_inicio }}</ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label>Destino:</ion-label>
+            <ion-text>{{ viajeActivo?.nom_destino }}</ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label>Costo:</ion-label>
+            <ion-text>{{ viajeActivo?.costo_perperson }}</ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label>Estado:</ion-label>
+            <ion-text>{{ viajeActivo?.activo ? 'Activo' : 'Finalizado' }}</ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label>Fecha:</ion-label>
+            <ion-text>{{ viajeActivo?.fecha | date:'short' }}</ion-text>
+          </ion-item>
+        </ion-list>
   
+        <ion-button expand="block" color="danger" (click)="endTrip()">
+          Finalizar Viaje
+        </ion-button>
+  
+        <ion-button expand="block" color="medium" (click)="cerrarModalViaje()">
+          Cerrar
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

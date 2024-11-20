@@ -33,10 +33,22 @@
     }
   }
 
-  .driversList {
+  .tripsList {
     --background: transparent;
     background-color: rgb(20,20,20);
     padding: 0;
+
+    ion-item p {
+      padding: 0;
+      margin: 0;
+      text-align: left;
+      color: white;
+    }
+
+    ion-item p:hover {
+      transition: 0;
+      color: white;
+    }
   }
 
   .clickable-item {
@@ -109,4 +121,39 @@ body.barcode-scanner-active {
 
   border-radius: 5px;
   padding: 5px;
+}
+
+#duration {
+  position: absolute;
+  z-index: 2;
+  top: 15px;
+  left: 15px;
+
+  background-color: rgba(0,0,0,.5);
+  color: white;
+
+  border-radius: 5px;
+  padding: 5px;
+}
+
+#simbology {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  top: 30px;
+
+  background-color: rgba(255, 255, 255, 0.9);
+  color: rgb(0, 0, 0);
+
+  border-radius: 5px;
+  padding: 5px;
+
+  label {
+    font-size: 12px;
+  }
+
+  h5 {
+    font-size: 15px;
+    margin: 0;
+  }
 }

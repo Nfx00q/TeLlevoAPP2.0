@@ -1,6 +1,6 @@
 /// <reference types="@types/google.maps" />
 
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Geolocation } from '@capacitor/geolocation';
 import { AngularFirestore } from '@angular/fire/compat/firestore'
@@ -37,6 +37,8 @@ export class DriverPage implements OnInit, AfterViewInit {
 
   costoViaje: string = '';
   codigoViaje: string = '';
+
+  viajeActivo: any = null;
 
   /* ------ USUARIO ------ */
 
@@ -253,8 +255,12 @@ export class DriverPage implements OnInit, AfterViewInit {
                         costo_perperson: this.costoViaje,
                         nom_conductor: this.usuario.nombre,
                         conductorUid: this.usuario.uid,
-                        can_disponibles: 4
+                        can_disponibles: 4,
+                        activo: true
                     };
+
+                    // Guardar el viaje como activo
+                    this.viajeActivo = nuevoViaje;
 
                     this.viajesService.crearViaje(nuevoViaje).subscribe({
                         next: (codigo) => {
@@ -272,6 +278,25 @@ export class DriverPage implements OnInit, AfterViewInit {
         }
     }
   }
+
+  endTrip() {
+    if (this.viajeActivo) {
+      console.log('Finalizando viaje con código:', this.viajeActivo.codigo);
+  
+      this.viajesService.actualizarViajePorCodigo(this.viajeActivo.codigo, { activo: false }).subscribe({
+        next: () => {
+          console.log('Viaje finalizado con éxito.');
+          this.viajeActivo = null; // Reinicia el estado del viaje activo
+        },
+        error: (error) => {
+          console.error('Error al finalizar el viaje:', error.message || error);
+        },
+      });
+    } else {
+      console.error('No hay un viaje activo para finalizar.');
+    }
+  }
+  
 
   /* ---- COSTO VIAJE ------ */
 
@@ -303,5 +328,23 @@ export class DriverPage implements OnInit, AfterViewInit {
 
   goToConfig() {
     this.router.navigate(['/config-page']);
+  }
+
+  /* -------- MODAL DE VIAJE ----------- */
+
+  @ViewChild('modalViajeActivo') modalViajeActivo: HTMLIonModalElement | undefined;
+
+  // Método para abrir el modal
+  abrirModalViaje() {
+    if (this.modalViajeActivo) {
+      this.modalViajeActivo.present();
+    }
+  }
+
+  // Método para cerrar el modal
+  cerrarModalViaje() {
+    if (this.modalViajeActivo) {
+      this.modalViajeActivo.dismiss();
+    }
   }
 }

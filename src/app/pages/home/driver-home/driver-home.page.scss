@@ -51,25 +51,31 @@
     }
   }
 
-#simbology {
-  position: absolute;
-  z-index: 2;
-  right: 10px;
-  top: 30px;
-
-  background-color: rgba(255, 255, 255, 0.9);
-  color: rgb(0, 0, 0);
-
-  border-radius: 5px;
-  padding: 5px;
-
-  label {
-    font-size: 12px;
+.infoViaje {
+  ion-content {
+    --background: rgb(20, 20, 20);
   }
 
-  h5 {
-    font-size: 15px;
-    margin: 0;
+  h1 {
+    color: white;
+  }
+
+  ion-label {
+    color: white;
+  }
+  
+  ion-text {
+    color: white;
+  }
+
+  ion-item {
+    --background: transparent;
+    color: white;
+
+    :hover {
+      color: white;
+      --background: transparent;
+    }
   }
 }
 
