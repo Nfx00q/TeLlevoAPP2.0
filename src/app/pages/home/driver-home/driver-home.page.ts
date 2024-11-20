@@ -49,7 +49,13 @@ export class DriverPage implements OnInit, AfterViewInit {
 
   nombreUsuario?: string;
 
+  /* ------------ RENDER ------------- */
+
   private renderers: any[] = [];
+
+  /* ----------- CARGA DE CREACION DE VIAJE -------------- */
+
+  isDivVisible = false;
   
   ubicaciones = [
     { lat: -33.598425578019224, lng: -70.57833859675443, icon: 'assets/icon/instituto.png', label: 'Cede Puente Alto', value: 'puente_alto', title: 'Duoc UC' },
@@ -266,7 +272,11 @@ export class DriverPage implements OnInit, AfterViewInit {
                         next: (codigo) => {
                             this.codigoViaje = codigo;
                             this.qrViaje = codigo;
-                            console.log(`Código de viaje: ${this.codigoViaje}`);
+                            this.toggleCarga();
+                            setTimeout(() => {
+                              this.abrirModalViaje();
+                              this.toggleCarga();
+                            }, 3000);
                         },
                         error: (error) => console.error('Error al guardar el viaje:', error)
                     });
@@ -346,5 +356,11 @@ export class DriverPage implements OnInit, AfterViewInit {
     if (this.modalViajeActivo) {
       this.modalViajeActivo.dismiss();
     }
+  }
+
+  // CARGA DE CREACION DE VIAJE
+
+  toggleCarga() {
+    this.isDivVisible = !this.isDivVisible;
   }
 }

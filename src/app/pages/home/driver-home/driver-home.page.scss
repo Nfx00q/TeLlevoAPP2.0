@@ -56,6 +56,11 @@
     --background: rgb(20, 20, 20);
   }
 
+  ion-content ion-list {
+    --background: rgb(20, 20, 20);
+    background-color: rgb(20,20,20);
+  }
+
   h1 {
     color: white;
   }
@@ -76,6 +81,11 @@
       color: white;
       --background: transparent;
     }
+
+    ion-text {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
   }
 }
 
@@ -90,4 +100,25 @@
 
   border-radius: 5px;
   padding: 5px;
+}
+
+// CREANDO VIAJE
+
+#creatingTrip {
+  z-index: 10 !important;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-30%);
+
+  padding: 10px;
+  background-color: rgba(0,0,0,.6);
+  border-radius: 10px;
+
+  color: white;
+  font-size: 14px;
+
+  p {
+    text-align: center;
+  }
 }

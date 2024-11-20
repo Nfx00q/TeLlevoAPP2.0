@@ -17,6 +17,9 @@
 
     <div id="map" class="map"></div>
     <div id="duration"></div>
+    <div *ngIf="isDivVisible" id="creatingTrip">
+      <p><ion-spinner name="crescent" style="color: rgb(255, 255, 255);" slot="start"></ion-spinner>Creando viaje...</p>
+    </div>
 
     <div id="welcome">
       <label>Bienvenido: {{ nombreUsuario }}</label>
@@ -85,43 +88,43 @@
             </ion-col>
           </ion-row>
         </ion-grid>
-
-        <div class="userTripQR">
-          <qrcode *ngIf="codigoViaje" [qrdata]="qrViaje" [width]="180" [errorCorrectionLevel]="'M'"></qrcode>
-        </div>
         
       </ion-content>
     </ng-template>
   </ion-modal>
 
-  <ion-modal #modalViajeActivo [isOpen]="false" [initialBreakpoint]="0.6" [breakpoints]="[0.6, 0.85]" class="infoViaje">
+  <ion-modal #modalViajeActivo [isOpen]="false" [initialBreakpoint]="1" [breakpoints]="[1]" class="infoViaje">
     <ng-template>
       <ion-content>
         <h1 style="text-align: center;">Información del Viaje</h1>
-        <ion-list>
-          <ion-item>
+        <ion-list lines="none">
+          <ion-item lines="none">
             <ion-label>Inicio:</ion-label>
             <ion-text>{{ viajeActivo?.nom_inicio }}</ion-text>
           </ion-item>
-          <ion-item>
+          <ion-item lines="none">
             <ion-label>Destino:</ion-label>
             <ion-text>{{ viajeActivo?.nom_destino }}</ion-text>
           </ion-item>
-          <ion-item>
+          <ion-item lines="none">
             <ion-label>Costo:</ion-label>
             <ion-text>{{ viajeActivo?.costo_perperson }}</ion-text>
           </ion-item>
-          <ion-item>
+          <ion-item lines="none">
             <ion-label>Estado:</ion-label>
             <ion-text>{{ viajeActivo?.activo ? 'Activo' : 'Finalizado' }}</ion-text>
           </ion-item>
-          <ion-item>
+          <ion-item lines="none">
             <ion-label>Fecha:</ion-label>
             <ion-text>{{ viajeActivo?.fecha | date:'short' }}</ion-text>
           </ion-item>
         </ion-list>
+
+        <div class="userTripQR">
+          <qrcode *ngIf="codigoViaje" [qrdata]="qrViaje" [width]="180" [errorCorrectionLevel]="'M'"></qrcode>
+        </div>
   
-        <ion-button expand="block" color="danger" (click)="endTrip()">
+        <ion-button expand="block" color="danger" (click)="endTrip()" style="margin-top: 10px; margin-bottom: 20px;">
           Finalizar Viaje
         </ion-button>
   
