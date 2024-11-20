@@ -3,12 +3,14 @@ import { AngularFirestore } from "@angular/fire/compat/firestore";
 import { Router } from "@angular/router";
 import {
   BarcodeScanner,
+  LensFacing,
 } from "@capacitor-mlkit/barcode-scanning";
 import { Geolocation } from "@capacitor/geolocation";
-import { MenuController, Platform } from "@ionic/angular";
+import { MenuController, ModalController, Platform } from "@ionic/angular";
 import { Viajes } from "src/app/interfaces/viajes";
 import { AuthServiceService } from "src/app/services/auth-service.service";
 import { ViajesService } from "src/app/services/viejes.service";
+import { BarcodeScanningModalComponent } from "./barcode-scanning-modal.component";
 
 declare var google: any;
 
@@ -89,7 +91,8 @@ export class UserHomePage implements OnInit {
     private platform: Platform,
     private menuController: MenuController,
     private authService: AuthServiceService,
-    private viajeService: ViajesService
+    private viajeService: ViajesService,
+    private modalController: ModalController
   ) {}
 
   ngOnInit() {
@@ -227,133 +230,57 @@ export class UserHomePage implements OnInit {
     this.router.navigate(["/config-page"]);
   }
 
-  /* ---- Scan QR Code ----- */
-
-  /* async startScan() { 
-    const modal = await this.modalController.create({
-      component: BarcodeScanningModalComponent,
-      cssClass: "barcode-scanner-modal",
-      showBackdrop: false,
-      componentProps: {
-        formats: [],
-        LensFacing: LensFacing.Back,
-      },
-      presentingElement: await this.modalController.getTop(),
-    });
-
-    await modal.present();
-
-    // Resultado del escaneo
-    const { data } = await modal.onDidDismiss();
-
-    // Resultado del escaneo
-    if (data?.barcode?.displayValue) {
-      this.codigoEscaneado = data.barcode.displayValue;
-      console.log(`Código escaneado: ${this.codigoEscaneado}`);
-
-      // Buscar el viaje en Firebase
-      this.firestore
-        .collection("viajes")
-        .doc(this.codigoEscaneado)
-        .get()
-        .subscribe((doc) => {
-          if (doc.exists) {
-            this.viajeInfo = doc.data() as Viajes;
-            console.log("Viaje encontrado:", this.viajeInfo);
-
-            // Verificar disponibilidad
-            if (this.viajeInfo.can_disponibles > 0) {
-              // Obtener la información del conductor usando conductorUid
-              const conductorUid = this.viajeInfo.conductorUid;
-              console.log("Conductor UID:", conductorUid);
-
-              this.firestore
-                .collection("usuarios")
-                .doc(conductorUid)
-                .get()
-                .subscribe((conductorDoc) => {
-                  if (conductorDoc.exists) {
-                    this.conductorInfo = conductorDoc.data();
-                    console.log(
-                      "Información del conductor:",
-                      this.conductorInfo
-                    );
-
-                    // Obtener la información del vehículo
-                    const vehiculo = this.conductorInfo?.vehiculo;
-                    if (vehiculo) {
-                      console.log("Información del vehículo:", vehiculo);
-                      const { marca, modelo, color, img_vehiculo } = vehiculo;
-                      this.vehiculoInfo = {
-                        marca,
-                        modelo,
-                        color,
-                        img_vehiculo,
-                      };
-                      console.log("Marca:", marca);
-                      console.log("Modelo:", modelo);
-                      console.log("Color:", color);
-                      console.log("Imagen del vehículo:", img_vehiculo);
-                    } else {
-                      console.log(
-                        "El conductor no tiene un vehículo registrado."
-                      );
-                    }
-                    // Reducir la cantidad de asientos disponibles en 1
-                    this.firestore
-                      .collection("viajes")
-                      .doc(this.codigoEscaneado)
-                      .update({
-                        can_disponibles: this.viajeInfo.can_disponibles - 1,
-                      })
-                      .then(() => {
-                        console.log("Información cargada correctamente");
-                        this.isScanned = true;
-                      })
-                      .catch((error) => {
-                        console.error(
-                          "Error al actualizar can_disponibles:",
-                          error
-                        );
-                      });
-                  } else {
-                    console.log("Conductor no encontrado.");
-                  }
-                });
-            } else {
-              console.log("No hay asientos disponibles.");
-            }
-          } else {
-            console.log("Viaje no encontrado.");
-          }
-        });
-    }
-  }
-  
-  */
-
   async startScan() {
-    const codigoSimulado = "3kCrdwbCsOCs48EjSa0h"; // Replace with an actual test code from your database
-    this.codigoEscaneado = codigoSimulado;
-    console.log(`Simulated scanned code: ${this.codigoEscaneado}`);
-
-    // Fetch the trip from Firebase using the "codigo" field
+    // Verificar si estamos en un entorno móvil
+    const isMobile = !!(navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone|iPad|iPod/i));
+  
+    if (isMobile) {
+      // Entorno móvil: usar escáner QR real
+      const modal = await this.modalController.create({
+        component: BarcodeScanningModalComponent,
+        cssClass: "barcode-scanner-modal",
+        showBackdrop: false,
+        componentProps: {
+          formats: [], // Especificar formatos de código si es necesario
+          LensFacing: LensFacing.Back,
+        },
+        presentingElement: await this.modalController.getTop(),
+      });
+  
+      await modal.present();
+  
+      // Resultado del escaneo
+      const { data } = await modal.onDidDismiss();
+  
+      if (data?.barcode?.displayValue) {
+        this.codigoEscaneado = data.barcode.displayValue;
+        console.log(`Código escaneado: ${this.codigoEscaneado}`);
+      } else {
+        console.log("No se escaneó ningún código.");
+        return;
+      }
+    } else {
+      // Entorno de desarrollo en PC: usar código simulado
+      const codigoSimulado = "3kCrdwbCsOCs48EjSa0h"; // Reemplazar con un código válido de prueba
+      this.codigoEscaneado = codigoSimulado;
+      console.log(`Código simulado escaneado: ${this.codigoEscaneado}`);
+    }
+  
+    // Buscar el viaje en Firebase usando el campo "codigo"
     this.firestore
-      .collection("viajes", (ref) =>
-        ref.where("codigo", "==", this.codigoEscaneado)
-      )
+      .collection("viajes", (ref) => ref.where("codigo", "==", this.codigoEscaneado))
       .get()
       .subscribe((querySnapshot) => {
         if (!querySnapshot.empty) {
-          // Assuming there's only one trip with this code
+          // Asumiendo que solo hay un viaje con este código
           const doc = querySnapshot.docs[0];
           this.viajeInfo = doc.data() as Viajes;
-          console.log("Trip found:", this.viajeInfo);
-
+          console.log("Viaje encontrado:", this.viajeInfo);
+  
           if (this.viajeInfo.can_disponibles > 0) {
             const conductorUid = this.viajeInfo.conductorUid;
-            console.log("Driver UID:", conductorUid);
-
+            console.log("UID del conductor:", conductorUid);
+  
             this.firestore
               .collection("usuarios")
               .doc(conductorUid)
@@ -361,12 +288,11 @@ export class UserHomePage implements OnInit {
               .subscribe((conductorDoc) => {
                 if (conductorDoc.exists) {
                   this.conductorInfo = conductorDoc.data();
-
+  
                   const vehiculo = this.conductorInfo?.vehiculo;
                   if (vehiculo) {
-                    console.log("Vehicle information:", vehiculo);
-                    const { marca, modelo, color, img_vehiculo, patente } =
-                      vehiculo;
+                    console.log("Información del vehículo:", vehiculo);
+                    const { marca, modelo, color, img_vehiculo, patente } = vehiculo;
                     this.vehiculoInfo = {
                       marca,
                       modelo,
@@ -375,58 +301,51 @@ export class UserHomePage implements OnInit {
                       patente,
                     };
                   } else {
-                    console.log(
-                      "The driver does not have a registered vehicle."
-                    );
+                    console.log("El conductor no tiene un vehículo registrado.");
                   }
-
-                  // Reduce the available seats by 1 and add the passenger UID to the trip
+  
+                  // Reducir asientos disponibles y agregar UID del pasajero
                   const updatedPasajeros = this.viajeInfo.pasajeros || [];
-                  updatedPasajeros.push(this.usuario.uid);  // Add the scanned user's UID
-                  
+                  updatedPasajeros.push(this.usuario.uid); // Agregar UID del usuario escaneado
+  
                   this.firestore
                     .collection("viajes")
-                    .doc(doc.id) // Use the document ID for the update
+                    .doc(doc.id) // Usar el ID del documento para actualizar
                     .update({
                       can_disponibles: this.viajeInfo.can_disponibles - 1,
-                      pasajeros: updatedPasajeros,  // Store the list of passenger UIDs
-                      activo: true // Set the trip status as active
+                      pasajeros: updatedPasajeros, // Almacenar la lista de UIDs de pasajeros
+                      activo: true, // Establecer el viaje como activo
                     })
                     .then(() => {
-                      console.log("Information loaded successfully");
+                      console.log("Información cargada correctamente");
                       this.isScanned = true;
-
-                      // Parse coordinates and generate routes on the map
-                      const inicio = JSON.parse(
-                        this.viajeInfo.coordenada_inicio || "{}"
-                      );
-                      const destino = JSON.parse(
-                        this.viajeInfo.coordenada_destino || "{}"
-                      );
-
+  
+                      // Generar ruta en el mapa
+                      const inicio = JSON.parse(this.viajeInfo.coordenada_inicio || "{}");
+                      const destino = JSON.parse(this.viajeInfo.coordenada_destino || "{}");
+  
                       if (inicio && destino) {
                         this.generateRoute(inicio, destino);
                       } else {
-                        console.log(
-                          "Starting or destination coordinates missing."
-                        );
+                        console.log("Coordenadas de inicio o destino faltantes.");
                       }
                     })
                     .catch((error) => {
-                      console.error("Error updating available seats:", error);
+                      console.error("Error al actualizar los asientos disponibles:", error);
                     });
                 } else {
-                  console.log("Driver not found.");
+                  console.log("Conductor no encontrado.");
                 }
               });
           } else {
-            console.log("No seats available.");
+            console.log("No hay asientos disponibles.");
           }
         } else {
-          console.log("Trip not found.");
+          console.log("Viaje no encontrado.");
         }
       });
   }
+  
 
 
   // Helper function to generate the route on the map
