@@ -11,6 +11,7 @@ import { Viajes } from "src/app/interfaces/viajes";
 import { AuthServiceService } from "src/app/services/auth-service.service";
 import { ViajesService } from "src/app/services/viejes.service";
 import { BarcodeScanningModalComponent } from "./barcode-scanning-modal.component";
+import firebase from 'firebase/compat/app';
 
 declare var google: any;
 
@@ -20,33 +21,30 @@ declare var google: any;
   styleUrls: ["./user-home.page.scss"],
 })
 export class UserHomePage implements OnInit {
-  /* ----- Obtener USUARIOS (Conductores disponibles) ------ */
-
+  // Usuarios disponibles
   usuarios: any[] = [];
   usuario: any;
   nombreUsuario?: string;
 
-  /* ----- Info del viaje SCANEADO ------ */
-
+  // Info del viaje escaneado
   public codigoEscaneado: string = "";
   viajeInfo: any;
   conductorInfo: any;
   vehiculoInfo: any;
 
+  // Mapa y servicios de direcciones
   map: any;
   directionsService: any;
   directionsRenderer: any;
 
-  /* ------- VIAJES ----------- */
-
-  viajes?: any [] = [];
-
+  // Viajes
+  viajes?: any[] = [];
   private renderers: google.maps.DirectionsRenderer[] = [];
 
-  /* ----- SCANNER ------ */
-
+  // Scanner
   isScanned: boolean = false;
 
+  // Ubicaciones predeterminadas
   ubicaciones = [
     {
       lat: -33.598425578019224,
@@ -84,6 +82,7 @@ export class UserHomePage implements OnInit {
       title: "TL-3",
     },
   ];
+
   viajeActivo: any;
 
   constructor(
@@ -109,13 +108,11 @@ export class UserHomePage implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.loadGoogleMaps().then(() => {
-      this.initMap();
-    });
+    this.loadGoogleMaps().then(() => this.initMap());
 
     this.authService.getCurrentUser().subscribe((user) => {
       if (user && user.uid) {
-        // Obtener los datos del usuario desde Firestore
+        // Obtener datos del usuario autenticado
         this.authService.getUserData(user.uid).subscribe((userData) => {
           this.usuario = userData;
           this.nombreUsuario = userData?.nombre;
@@ -132,13 +129,11 @@ export class UserHomePage implements OnInit {
     });
   }
 
-  getViajes(){
+  getViajes() {
     this.viajeService.getViajes().subscribe((viajes) => {
       this.viajes = viajes;
-    })
+    });
   }
-
-  /* ----- INICIALIZAR MAPA ----- */
 
   async initMap() {
     const mapOptions = {
@@ -151,7 +146,6 @@ export class UserHomePage implements OnInit {
       ],
     };
 
-    // Inicializa el mapa y los servicios de direcciones
     this.map = new google.maps.Map(document.getElementById("map"), mapOptions);
     this.directionsService = new google.maps.DirectionsService();
     this.directionsRenderer = new google.maps.DirectionsRenderer({
@@ -161,14 +155,12 @@ export class UserHomePage implements OnInit {
     this.directionsRenderer.setMap(this.map);
 
     try {
-      // Obtiene la ubicación actual del usuario usando Capacitor
       const position = await Geolocation.getCurrentPosition();
       const pos = {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
       };
 
-      // Agrega el marcador de ubicación actual
       new google.maps.Marker({
         position: pos,
         map: this.map,
@@ -184,13 +176,12 @@ export class UserHomePage implements OnInit {
       alert("No se pudo obtener la ubicación actual.");
     }
 
-    // Agrega marcadores personalizados para cada ubicación en `ubicaciones`
     this.ubicaciones.forEach((ubicacion) => {
       const marker = new google.maps.Marker({
         position: { lat: ubicacion.lat, lng: ubicacion.lng },
         map: this.map,
         icon: {
-          url: `${ubicacion.icon}?t=${new Date().getTime()}`, // Evita la cache del icono
+          url: `${ubicacion.icon}?t=${new Date().getTime()}`,
           scaledSize: new google.maps.Size(40, 40),
         },
         title: ubicacion.label,
@@ -201,15 +192,6 @@ export class UserHomePage implements OnInit {
       });
       marker.addListener("click", () => infoWindow.open(this.map, marker));
     });
-
-    // Configuración de manejo de error de geolocalización
-    function handleLocationError(browserHasGeolocation: boolean, pos: any) {
-      alert(
-        browserHasGeolocation
-          ? "Error: El servicio de geolocalización ha fallado."
-          : "Error: Tu navegador no soporta la geolocalización."
-      );
-    }
   }
 
   loadGoogleMaps(): Promise<any> {
@@ -231,26 +213,21 @@ export class UserHomePage implements OnInit {
     this.router.navigate(["/config-page"]);
   }
 
-
-  
   async startScan() {
     try {
-      // Abrir el modal para el escaneo del QR
       const modal = await this.modalController.create({
         component: BarcodeScanningModalComponent,
         cssClass: "barcode-scanner-modal",
         showBackdrop: false,
         componentProps: {
-          formats: [], // Especificar formatos de código si es necesario
+          formats: [],
           LensFacing: LensFacing.Back,
         },
         presentingElement: await this.modalController.getTop(),
       });
-  
-      // Mostrar el modal
+
       await modal.present();
-  
-      // Esperar el resultado del escaneo
+
       const { data } = await modal.onDidDismiss();
       if (data?.barcode?.displayValue) {
         this.codigoEscaneado = data.barcode.displayValue;
@@ -259,8 +236,7 @@ export class UserHomePage implements OnInit {
         console.log("No se escaneó ningún código.");
         return;
       }
-  
-      // Buscar el viaje en Firebase usando el código escaneado
+
       this.firestore
         .collection("viajes")
         .doc(this.codigoEscaneado)
@@ -268,14 +244,10 @@ export class UserHomePage implements OnInit {
         .subscribe((doc) => {
           if (doc.exists) {
             this.viajeInfo = doc.data() as Viajes;
-            console.log("Viaje encontrado:", this.viajeInfo);
-  
-            // Verificar disponibilidad
+
             if (this.viajeInfo.can_disponibles > 0) {
-              // Obtener la información del conductor usando conductorUid
               const conductorUid = this.viajeInfo.conductorUid;
-              console.log("Conductor UID:", conductorUid);
-  
+
               this.firestore
                 .collection("usuarios")
                 .doc(conductorUid)
@@ -283,184 +255,112 @@ export class UserHomePage implements OnInit {
                 .subscribe((conductorDoc) => {
                   if (conductorDoc.exists) {
                     this.conductorInfo = conductorDoc.data();
-  
-                    // Obtener la información del vehículo
                     const vehiculo = this.conductorInfo?.vehiculo;
+
                     if (vehiculo) {
-                      console.log("Información del vehículo:", vehiculo);
-                      const { marca, modelo, color, img_vehiculo, patente } = vehiculo;
-                      this.vehiculoInfo = {
-                        marca,
-                        modelo,
-                        color,
-                        img_vehiculo,
-                        patente,
-                      };
+                      this.vehiculoInfo = { ...vehiculo };
                     } else {
                       console.log("El conductor no tiene un vehículo registrado.");
                     }
 
                     const updatedPasajeros = this.viajeInfo.pasajeros || [];
-                    updatedPasajeros.push(this.usuario.uid);  // Add the scanned user's UID
-                  
-  
-                    // Reducir la cantidad de asientos disponibles en 1
+                    updatedPasajeros.push(this.usuario.uid);
+
                     this.firestore
                       .collection("viajes")
                       .doc(this.codigoEscaneado)
                       .update({
-                        can_disponibles: this.viajeInfo.can_disponibles - 1,
-                        pasajeros: updatedPasajeros,
-                        activo: true
+                        pasajeros: firebase.firestore.FieldValue.arrayUnion(this.usuario.uid),
+                        can_disponibles: firebase.firestore.FieldValue.increment(-1),
+                        activo: true,
                       })
                       .then(() => {
-                        console.log("Información cargada correctamente");
-                        this.isScanned = true;
-
-                        // Parse coordinates and generate routes on the map
-                        const inicio = JSON.parse(
-                          this.viajeInfo.coordenada_inicio || "{}"
-                        );
-                        const destino = JSON.parse(
-                          this.viajeInfo.coordenada_destino || "{}"
-                        );
-
-                        if (inicio && destino) {
-                          this.generateRoute(inicio, destino);
-                        } else {
-                          console.log(
-                            "Starting or destination coordinates missing."
-                          );
-                        }
+                        console.log("Pasajero agregado correctamente al viaje.");
                       })
                       .catch((error) => {
-                        console.error("Error al actualizar can_disponibles:", error);
+                        console.error("Error al agregar pasajero:", error);
                       });
-                  } else {
-                    console.log("Conductor no encontrado.");
-                  }
+                    }
                 });
             } else {
-              console.log("No hay asientos disponibles.");
+              console.error("Este viaje no tiene cupos disponibles.");
+              alert("Viaje sin disponibilidad.");
             }
           } else {
-            console.log("Viaje no encontrado.");
+            console.log("El código escaneado no corresponde a un viaje registrado.");
+            alert("Código inválido.");
           }
         });
     } catch (error) {
-      console.error("Error al escanear el código QR:", error);
+      console.error("Error al escanear el código:", error);
     }
-  }  
-  endTrip() {
-    if (this.viajeActivo) {
-      console.log('Finalizando viaje con código:', this.viajeActivo.codigo);
+  }
 
-      this.viajeService
-        .actualizarViajePorCodigo(this.viajeActivo.codigo, { activo: false })
-        .subscribe({
-          next: () => {
-            console.log('Viaje finalizado con éxito.');
-            this.viajeActivo = null; // Reinicia el estado del viaje activo
-          },
-          error: (error) => {
-            console.error('Error al finalizar el viaje:', error.message || error);
-          },
+  calculateAndDisplayRoute(origin: any, destination: any) {
+    const request = {
+      origin,
+      destination,
+      travelMode: google.maps.TravelMode.DRIVING,
+    };
+
+    this.directionsService.route(request, (response: any, status: string) => {
+      if (status === google.maps.DirectionsStatus.OK) {
+        const renderer = new google.maps.DirectionsRenderer({
+          suppressMarkers: true,
+          map: this.map,
+          polylineOptions: { strokeColor: "#242424", strokeWeight: 5 },
         });
-    } else {
-      console.error('No hay un viaje activo para finalizar.');
-    }}
+        renderer.setDirections(response);
+        this.renderers.push(renderer);
+      } else {
+        console.error("Error al calcular la ruta:", status);
+      }
+    });
+  }
+
+  cerrarSesion() {
+    this.authService.logOut().then(() => this.router.navigate(["/"]));
+  }
+
+  async loadViajeInfo(codigoViaje: string) {
+    try {
+      const viajeDoc = await this.firestore
+        .collection("viajes")
+        .doc(codigoViaje)
+        .get()
+        .toPromise();
   
-  // Helper function to generate the route on the map
-  generateRoute(
-    inicio: { lat: number; lng: number },
-    destino: { lat: number; lng: number }
-  ) {
-    // Clear any previous routes
-    this.renderers.forEach((renderer) => renderer.setMap(null));
-    this.renderers = [];
-
-    // Create route renderers
-    const createRenderer = (color: string, weight: number, opacity: number) =>
-      new google.maps.DirectionsRenderer({
-        suppressMarkers: true,
-        polylineOptions: {
-          strokeColor: color,
-          strokeWeight: weight,
-          strokeOpacity: opacity,
-          geodesic: true,
-        },
-      });
-
-    const walkingRenderer = createRenderer("#6C6C6C", 5, 0.7);
-    const drivingRenderer = createRenderer("#373737", 6, 0.8);
-
-    walkingRenderer.setMap(this.map);
-    drivingRenderer.setMap(this.map);
-    this.renderers.push(walkingRenderer, drivingRenderer);
-
-    // Get current location and calculate the walking route to the start point
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const currentPos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        const requestWalking: google.maps.DirectionsRequest = {
-          origin: currentPos,
-          destination: inicio,
-          travelMode: google.maps.TravelMode.WALKING,
-        };
-
-        this.directionsService.route(
-          requestWalking,
-          (
-            result: google.maps.DirectionsResult,
-            status: google.maps.DirectionsStatus
-          ) => {
-            if (status === google.maps.DirectionsStatus.OK) {
-              walkingRenderer.setDirections(result);
-            } else {
-              console.error("Walking route error:", status);
-            }
+      if (viajeDoc?.exists) {
+        this.viajeInfo = viajeDoc.data(); // Información básica del viaje
+  
+        // Obtener los datos de cada pasajero
+        const pasajerosUids = this.viajeInfo?.pasajeros || [];
+        this.viajeInfo.pasajerosInfo = []; // Crear un arreglo para almacenar los datos de los pasajeros
+  
+        for (const uid of pasajerosUids) {
+          const userDoc = await this.firestore
+            .collection("usuarios")
+            .doc(uid)
+            .get()
+            .toPromise();
+  
+          if (userDoc?.exists) {
+            this.viajeInfo.pasajerosInfo.push(userDoc.data()); // Agregar los datos del usuario al arreglo
+          } else {
+            console.error(`No se encontró un usuario con UID: ${uid}`);
           }
-        );
+        }
+      } else {
+        console.error("El viaje no existe.");
+      }
+    } catch (error) {
+      console.error("Error al cargar información del viaje:", error);
+    }
+  }
 
-        // Calculate the driving route from the start to the destination
-        const requestDriving: google.maps.DirectionsRequest = {
-          origin: inicio,
-          destination: destino,
-          travelMode: google.maps.TravelMode.DRIVING,
-        };
-
-        // Función para procesar y mostrar la duración
-        const displayDuration = (
-          result: google.maps.DirectionsResult,
-          renderer: google.maps.DirectionsRenderer
-        ) => {
-          renderer.setDirections(result);
-          const durationText =
-            result.routes[0].legs[0].duration?.text ?? "Desconocido";
-          const durationElement = document.getElementById("duration");
-          if (durationElement) durationElement.innerText = durationText;
-          console.log(`Tiempo estimado: ${durationText}`);
-        };
-
-        this.directionsService.route(
-          requestDriving,
-          (
-            result: google.maps.DirectionsResult,
-            status: google.maps.DirectionsStatus
-          ) => {
-            if (status === google.maps.DirectionsStatus.OK) {
-              drivingRenderer.setDirections(result);
-              displayDuration(result, walkingRenderer);
-            } else {
-              console.error("Driving route error:", status);
-            }
-          }
-        );
-      },
-      () => console.error("Error retrieving current location.")
-    );
+  vaciarCard() {
+    this.conductorInfo = null;
+    this.vehiculoInfo = null;
+    this.viajeInfo = null;
   }
 }

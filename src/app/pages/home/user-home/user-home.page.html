@@ -47,8 +47,8 @@
   <ion-modal #modal trigger="op-modal" [initialBreakpoint]="[0.43]" [breakpoints]="[0.43, 1]" class="iniciarViaje">
     <ng-template>
       <ion-content>
-        <h1 style="text-align: center;">Selecciona un conductor</h1>
-        <p>Selecciona un conductor de tu preferencia para unirte a un viaje.</p>
+        <h1 style="text-align: center;">Selecciona un viaje</h1>
+        <p>Selecciona un viaje de tu comodidad para comenzar.</p>
   
         <ion-list class="tripsList">
           <div *ngFor="let viaje of viajes">
@@ -100,29 +100,22 @@
 
             <ion-card-title style="margin: 0;">Su viaje</ion-card-title>
 
+            <!-- Información del viaje -->
+
             <div *ngIf="viajeInfo">
-              <p style="color: rgba(255,255,255,0.5); font-size: 12px; text-align: center;">Codigo de viaje: {{ viajeInfo?.codigo }}</p>
-              <p style="color: rgba(255,255,255,0.3); font-size: 10px; text-align: center; padding: 0; margin-bottom: 10px;">Fecha de creación: {{ viajeInfo?.fecha?.toDate() | date: 'short' }}</p>
-              <p><strong>Inicio:</strong> {{ viajeInfo?.nom_inicio}}</p>
-              <p><strong>Destino:</strong> {{ viajeInfo?.nom_destino}}</p>
-              <!-- Pasajeros -->
-              <ion-card-title style="margin: 0;">Pasajeros</ion-card-title>
-              <div *ngIf="viajeInfo?.pasajeros?.length > 0">
-                <ul>
-                  <li *ngFor="let pasajero of viajeInfo.pasajeros">
-                    <p>{{ pasajero.nombre }} - Estado: {{ pasajero.estado }}</p>
-                  </li>
-                </ul>
-              </div>
-              <div *ngIf="viajeInfo?.pasajeros?.length === 0">
-                <p>No hay pasajeros aún.</p>
-              </div>
-              <p><strong>Costo (por persona)</strong></p>
-              
-              <p style="font-size: 30px; color: rgb(38, 70, 54); text-align: right;">{{ viajeInfo?.costo_perperson }}</p>
+
+              <!-- Inicio y destino -->
+
+              <p><strong>Inicio:</strong> {{ viajeInfo?.nom_inicio }}</p>
+              <p><strong>Destino:</strong> {{ viajeInfo?.nom_destino }}</p>
+
             </div>
-            <ion-button expand="block" color="danger" (click)="endTrip()" style="margin-top: 10px; margin-bottom: 20px;">
-              Finalizar Viaje
+
+            <!-- Pasajeros -->
+
+
+            <ion-button *nfIf="viajeInfo" expand="block" color="medium" (click)="vaciarCard()" style="margin-top: 10px;">
+              Vaciar Información
             </ion-button>
 
           </ion-card-content>
