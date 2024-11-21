@@ -84,6 +84,7 @@ export class UserHomePage implements OnInit {
       title: "TL-3",
     },
   ];
+  viajeActivo: any;
 
   constructor(
     private router: Router,
@@ -229,6 +230,8 @@ export class UserHomePage implements OnInit {
   goToConfig() {
     this.router.navigate(["/config-page"]);
   }
+
+
   
   async startScan() {
     try {
@@ -348,7 +351,25 @@ export class UserHomePage implements OnInit {
       console.error("Error al escanear el código QR:", error);
     }
   }  
+  endTrip() {
+    if (this.viajeActivo) {
+      console.log('Finalizando viaje con código:', this.viajeActivo.codigo);
 
+      this.viajeService
+        .actualizarViajePorCodigo(this.viajeActivo.codigo, { activo: false })
+        .subscribe({
+          next: () => {
+            console.log('Viaje finalizado con éxito.');
+            this.viajeActivo = null; // Reinicia el estado del viaje activo
+          },
+          error: (error) => {
+            console.error('Error al finalizar el viaje:', error.message || error);
+          },
+        });
+    } else {
+      console.error('No hay un viaje activo para finalizar.');
+    }}
+  
   // Helper function to generate the route on the map
   generateRoute(
     inicio: { lat: number; lng: number },
