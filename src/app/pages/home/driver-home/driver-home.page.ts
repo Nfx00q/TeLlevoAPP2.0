@@ -175,23 +175,7 @@ export class DriverPage implements OnInit, AfterViewInit {
           }
       });
   }
-  addPassenger() {
-    if (this.viajeActivo) {
-      const nuevoPasajero = {
-        nombre: "Juan Pérez", // Esto debería ser dinámico según el pasajero
-        estado: "Confirmado"  // Estado del pasajero
-      };
-
-      // Agregar el pasajero al viaje activo
-      this.viajeActivo.pasajeros.push(nuevoPasajero);
-
-      // Actualizar el viaje en Firestore
-      this.viajesService.actualizarViajePorCodigo(this.viajeActivo.codigo, { pasajeros: this.viajeActivo.pasajeros }).subscribe({
-        next: () => console.log("Pasajero agregado correctamente"),
-        error: (error) => console.error("Error al agregar pasajero", error)
-      });
-    }
-  }
+  
 
 
   /* ----- INICIAR VIAJE ----- */
