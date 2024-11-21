@@ -13,4 +13,6 @@ export interface Viajes {
     nom_conductor?: string;
     conductorUid?: string;
     activo?: boolean;
+
+    pasajeros?: { nombre: string; estado: string }[];
 }

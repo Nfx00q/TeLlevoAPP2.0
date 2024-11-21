@@ -118,6 +118,18 @@
             <ion-label>Fecha:</ion-label>
             <ion-text>{{ viajeActivo?.fecha | date:'short' }}</ion-text>
           </ion-item>
+          <ion-item lines="none">
+            <ion-label>Pasajeros:</ion-label>
+            <ion-text>
+              <ul *ngIf="viajeActivo?.pasajeros && viajeActivo.pasajeros.length > 0">
+                <li *ngFor="let pasajero of viajeActivo.pasajeros">
+                  {{ pasajero.nombre }} ({{ pasajero.estado }})
+                </li>
+              </ul>
+              <p *ngIf="!viajeActivo?.pasajeros || viajeActivo.pasajeros.length === 0">No hay pasajeros asignados.</p>
+            </ion-text>
+          </ion-item>
+          
         </ion-list>
 
         <div class="userTripQR">
