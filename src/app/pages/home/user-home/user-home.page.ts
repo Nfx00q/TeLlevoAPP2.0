@@ -296,71 +296,112 @@ export class UserHomePage implements OnInit {
     }
   }
 
-  calculateAndDisplayRoute(origin: any, destination: any) {
-    const request = {
-      origin,
-      destination,
-      travelMode: google.maps.TravelMode.DRIVING,
-    };
-
-    this.directionsService.route(request, (response: any, status: string) => {
-      if (status === google.maps.DirectionsStatus.OK) {
-        const renderer = new google.maps.DirectionsRenderer({
-          suppressMarkers: true,
-          map: this.map,
-          polylineOptions: { strokeColor: "#242424", strokeWeight: 5 },
-        });
-        renderer.setDirections(response);
-        this.renderers.push(renderer);
-      } else {
-        console.error("Error al calcular la ruta:", status);
-      }
-    });
-  }
-
   cerrarSesion() {
     this.authService.logOut().then(() => this.router.navigate(["/"]));
   }
 
-  async loadViajeInfo(codigoViaje: string) {
-    try {
-      const viajeDoc = await this.firestore
-        .collection("viajes")
-        .doc(codigoViaje)
-        .get()
-        .toPromise();
+  selectViaje(codigoViaje: string) {
+    console.log("Código del viaje seleccionado:", codigoViaje); // Verifica que no sea undefined
   
-      if (viajeDoc?.exists) {
-        this.viajeInfo = viajeDoc.data(); // Información básica del viaje
-  
-        // Obtener los datos de cada pasajero
-        const pasajerosUids = this.viajeInfo?.pasajeros || [];
-        this.viajeInfo.pasajerosInfo = []; // Crear un arreglo para almacenar los datos de los pasajeros
-  
-        for (const uid of pasajerosUids) {
-          const userDoc = await this.firestore
-            .collection("usuarios")
-            .doc(uid)
-            .get()
-            .toPromise();
-  
-          if (userDoc?.exists) {
-            this.viajeInfo.pasajerosInfo.push(userDoc.data()); // Agregar los datos del usuario al arreglo
-          } else {
-            console.error(`No se encontró un usuario con UID: ${uid}`);
-          }
-        }
-      } else {
-        console.error("El viaje no existe.");
-      }
-    } catch (error) {
-      console.error("Error al cargar información del viaje:", error);
+    if (!codigoViaje) {
+      console.error("Error: El código del viaje es undefined o null.");
+      alert("Error: No se pudo obtener el código del viaje.");
+      return;
     }
+  
+    this.firestore
+      .collection("viajes", ref => ref.where("codigo", "==", codigoViaje))
+      .get()
+      .subscribe((querySnapshot) => {
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+          this.viajeInfo = doc.data() as Viajes;
+  
+          if (this.viajeInfo.can_disponibles > 0) {
+            const conductorUid = this.viajeInfo.conductorUid;
+  
+            this.firestore
+              .collection("usuarios")
+              .doc(conductorUid)
+              .get()
+              .subscribe((conductorDoc) => {
+                if (conductorDoc.exists) {
+                  this.conductorInfo = conductorDoc.data();
+                  const vehiculo = this.conductorInfo?.vehiculo;
+  
+                  if (vehiculo) {
+                    this.vehiculoInfo = { ...vehiculo };
+                  } else {
+                    console.log("El conductor no tiene un vehículo registrado.");
+                  }
+  
+                  this.firestore
+                    .collection("viajes")
+                    .doc(doc.id)
+                    .update({
+                      pasajeros: firebase.firestore.FieldValue.arrayUnion(this.usuario.uid),
+                      can_disponibles: firebase.firestore.FieldValue.increment(-1),
+                      activo: true,
+                    })
+                    .then(() => {
+                      console.log("Pasajero agregado correctamente al viaje.");
+                    })
+                    .catch((error) => {
+                      console.error("Error al agregar pasajero:", error);
+                    });
+                }
+              });
+          } else {
+            console.error("Este viaje no tiene cupos disponibles.");
+            alert("Viaje sin disponibilidad.");
+          }
+        } else {
+          console.log("No se encontró el viaje con el código especificado.");
+          alert("Código inválido.");
+        }
+      }, (error) => {
+        console.error("Error al obtener los datos del viaje:", error);
+      });
   }
 
-  vaciarCard() {
-    this.conductorInfo = null;
-    this.vehiculoInfo = null;
-    this.viajeInfo = null;
+  removePassenger() {
+    if (!this.viajeInfo || !this.usuario?.uid) {
+      console.error("No hay un viaje activo o no se pudo obtener el UID del usuario.");
+      return;
+    }
+  
+    const viajeId = this.viajeInfo.codigo;
+  
+    this.firestore
+      .collection("viajes", ref => ref.where("codigo", "==", viajeId))
+      .get()
+      .subscribe((querySnapshot) => {
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+  
+          // Actualiza el viaje en Firestore para remover al pasajero
+          this.firestore
+            .collection("viajes")
+            .doc(doc.id)
+            .update({
+              pasajeros: firebase.firestore.FieldValue.arrayRemove(this.usuario.uid),
+              can_disponibles: firebase.firestore.FieldValue.increment(1),
+            })
+            .then(() => {
+              console.log("Pasajero eliminado del viaje.");
+  
+              // Limpia la información del viaje, conductor y vehículo en la vista
+              this.viajeInfo = null;
+              this.conductorInfo = null;
+              this.vehiculoInfo = null;
+              this.isScanned = false; // Restablece el estado del escaneo
+            })
+            .catch((error) => {
+              console.error("Error al eliminar pasajero del viaje:", error);
+            });
+        } else {
+          console.error("No se encontró el viaje para eliminar el pasajero.");
+        }
+      });
   }
 }

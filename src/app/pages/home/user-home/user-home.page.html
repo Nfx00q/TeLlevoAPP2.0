@@ -53,7 +53,7 @@
         <ion-list class="tripsList">
           <div *ngFor="let viaje of viajes">
             <ng-container *ngIf="viaje.activo">
-              <ion-item lines="none" class="clickable-item">
+              <ion-item lines="none" class="clickable-item" (click)="selectViaje(viaje.codigo)">
                 <ion-label>
                   <p><b>Desde:</b> {{ viaje.nom_inicio }}</p>
                   <p><b>Hacia:</b> {{ viaje.nom_destino }}</p>
@@ -78,18 +78,14 @@
 
         <ion-card *ngIf="conductorInfo" class="tripCard">
           <ion-card-content>
-
             <!-- Información del conductor -->
-
             <ion-card-title>Tu conductor</ion-card-title>
             <p><strong>Nombre:</strong> {{ conductorInfo?.nombre }} {{ conductorInfo?.apellido }}</p>
             <p><strong>Telefono:</strong> {{ conductorInfo?.telefono }}</p>
             <p><strong>RUT:</strong> {{ conductorInfo?.rut }}</p>
             
             <!-- Información del vehículo -->
-
             <ion-card-title style="margin: 0;">Su vehiculo</ion-card-title>
-
             <div *ngIf="vehiculoInfo">
               <p>{{ vehiculoInfo?.marca }} {{ vehiculoInfo?.modelo }} <strong>{{ vehiculoInfo?.color }}</strong></p>
               <p><strong>Patente: </strong> {{ vehiculoInfo?.patente }}</p>
@@ -97,29 +93,22 @@
             </div>
             
             <!-- Información del viaje -->
-
             <ion-card-title style="margin: 0;">Su viaje</ion-card-title>
-
-            <!-- Información del viaje -->
-
             <div *ngIf="viajeInfo">
-
-              <!-- Inicio y destino -->
-
               <p><strong>Inicio:</strong> {{ viajeInfo?.nom_inicio }}</p>
               <p><strong>Destino:</strong> {{ viajeInfo?.nom_destino }}</p>
-
+              <p><strong>Precio por persona:</strong></p>
+              <p style="font-size: 25px; color: greenyellow; font-weight: bolder;">{{ viajeInfo?.costo_perperson }}</p>
             </div>
-
-            <!-- Pasajeros -->
-
-
-            <ion-button *nfIf="viajeInfo" expand="block" color="medium" (click)="vaciarCard()" style="margin-top: 10px;">
-              Vaciar Información
-            </ion-button>
-
           </ion-card-content>
-        </ion-card>             
+        </ion-card>
+        
+        <!-- Botón para abandonar el viaje -->
+        <ion-button *ngIf="conductorInfo" expand="block" color="danger" (click)="removePassenger()" style="margin: 20px;">
+          <ion-icon name="exit-outline" slot="start"></ion-icon>
+          Abandonar viaje
+        </ion-button>
+
       </ion-content>
     </ng-template>
   </ion-modal>

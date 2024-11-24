@@ -120,14 +120,15 @@
           </ion-item>
           <ion-item lines="none">
             <ion-label>Pasajeros:</ion-label>
-            <ion-text>
-              <ul *ngIf="viajeActivo?.pasajeros && viajeActivo.pasajeros.length > 0">
-                <li *ngFor="let pasajero of viajeActivo.pasajeros">
-                  {{ pasajero.nombre }} ({{ pasajero.estado }})
+            <ion-item>
+              <ul *ngIf="pasajerosInfo.length > 0">
+                <li *ngFor="let pasajero of pasajerosInfo">
+                  <img *ngIf="pasajero.img_usuario" [src]="pasajero.img_usuario" alt="Imagen del pasajero" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;">
+                  {{ pasajero.nombre }} {{ pasajero.apellido }}
                 </li>
               </ul>
-              <p *ngIf="!viajeActivo?.pasajeros || viajeActivo.pasajeros.length === 0">No hay pasajeros asignados.</p>
-            </ion-text>
+              <p *ngIf="pasajerosInfo.length === 0">No hay pasajeros asignados.</p>
+            </ion-item>
           </ion-item>
           
         </ion-list>
@@ -136,11 +137,11 @@
           <qrcode *ngIf="codigoViaje" [qrdata]="qrViaje" [width]="180" [errorCorrectionLevel]="'M'"></qrcode>
         </div>
   
-        <ion-button expand="block" color="danger" (click)="endTrip()" style="margin-top: 10px; margin-bottom: 20px;">
+        <ion-button expand="block" color="danger" (click)="endTrip()" style="margin: 20px 10px;">
           Finalizar Viaje
         </ion-button>
   
-        <ion-button expand="block" color="medium" (click)="cerrarModalViaje()">
+        <ion-button expand="block" color="medium" (click)="cerrarModalViaje()" style="margin: 20px 10px;">
           Cerrar
         </ion-button>
       </ion-content>

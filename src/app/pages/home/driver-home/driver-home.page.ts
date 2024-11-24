@@ -39,6 +39,7 @@ export class DriverPage implements OnInit, AfterViewInit {
   codigoViaje: string = '';
 
   viajeActivo: any = null;
+  public pasajerosInfo: Usuario[] = [];
 
   /* ------ USUARIO ------ */
 
@@ -347,6 +348,7 @@ export class DriverPage implements OnInit, AfterViewInit {
 
   // Método para abrir el modal
   abrirModalViaje() {
+    this.loadPassengersInfo();
     if (this.modalViajeActivo) {
       this.modalViajeActivo.present();
     }
@@ -363,5 +365,27 @@ export class DriverPage implements OnInit, AfterViewInit {
 
   toggleCarga() {
     this.isDivVisible = !this.isDivVisible;
+  }
+
+  loadPassengersInfo() {
+    // Asegúrate de que viajeActivo y su campo 'pasajeros' estén definidos
+    if (this.viajeActivo?.pasajeros) {
+      this.pasajerosInfo = []; // Limpia el array antes de cargar los pasajeros
+  
+      // Itera sobre cada UID en el mapa 'pasajeros'
+      Object.keys(this.viajeActivo.pasajeros).forEach(uid => {
+        this.firestore.collection("usuarios").doc(uid).get().subscribe((doc) => {
+          if (doc.exists) {
+            this.pasajerosInfo.push(doc.data() as Usuario);
+          } else {
+            console.error(`No se encontró el usuario con UID: ${uid}`);
+          }
+        }, (error) => {
+          console.error("Error al obtener la información del pasajero:", error);
+        });
+      });
+    } else {
+      console.log("No hay pasajeros asignados al viaje.");
+    }
   }
 }
