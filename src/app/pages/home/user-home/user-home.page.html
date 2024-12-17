@@ -4,13 +4,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Google MAP Script -->
-
-    <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp4tplN5KEmKIHOV4vyFXuS6KKFsJqESg&libraries=places"
-      async 
-      defer>
-    </script>
-
+    <script
+    src="https://maps.googleapis.com/maps/api/js?key={{ environment.googleMapsConfig.apiKey }}&libraries=places"
+    async 
+    defer>
+   </script>
+  
   </head>
 
   <body>

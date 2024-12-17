@@ -169,7 +169,7 @@ export class DriverPage implements OnInit, AfterViewInit {
           } else {
               window['googleMapsCallback'] = () => resolve(true);
               const script = document.createElement('script');
-              script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAp4tplN5KEmKIHOV4vyFXuS6KKFsJqESg&callback=googleMapsCallback&t=${new Date().getTime()}`;
+              script.src = `https://maps.googleapis.com/maps/api/js?key={{ environment.googleMapsConfig.apiKey }}&libraries=places=${new Date().getTime()}`;
               script.async = true;
               script.defer = true;
               document.body.appendChild(script);

@@ -1,12 +1,15 @@
 export const environment = {
   production: true,
   firebaseConfig : {
-    apiKey: "AIzaSyCVS71hRlh-Rlde9D4CuAnR1Fof1dpm5Ow",
-    authDomain: "duoc013d.firebaseapp.com",
-    projectId: "duoc013d",
-    storageBucket: "duoc013d.appspot.com",
-    messagingSenderId: "976967590706",
-    appId: "1:976967590706:web:affc60ff8f8c4a70956d2b",
-    measurementId: "G-53BB16MNJP"
+    apiKey: "API_KEY_FIREBASE_CAMBIAR",
+    authDomain: "AUTH_DOMAIN_CAMBIAR",
+    projectId: "PROJECT_ID_CAMBIAR",
+    storageBucket: "STORAGE_BUCKET_CAMBIAR",
+    messagingSenderId: "MESSAGING_SENDER_ID_CAMBIAR",
+    appId: "APP_ID_CAMBIAR",
+    measurementId: "MEASUREMENT_ID_CAMBIAR"
+  },
+  googleMapsConfig: {
+    apiKey: "API_KEY_GOOGLE_MAPS_CAMBIAR"
   }
 };
